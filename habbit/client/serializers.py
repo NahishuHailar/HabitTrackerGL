@@ -6,7 +6,7 @@ from manage_hab.models import Habbit, HabbitGroup
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'image')
+        fields = ('id', 'username', 'image', 'email')
 
 
 class HabbitSerializer(serializers.ModelSerializer):

@@ -7,6 +7,13 @@ from manage_hab.models import Habbit, HabbitProgress, HabbitGroup
 from .serializers import HabbitGroupSerializer, UserSerializer, HabbitSerializer, HabbitSerializerdates
 
 
+class CreateUser(generics.CreateAPIView):
+    """
+    Create user after firebase autroization
+    """
+    serializer_class = UserSerializer
+
+
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
     Read, update, delete user profile
