@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
+   
+    'djoser',
 
     'users',
     'manage_hab',
@@ -145,5 +148,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         #'firebase_auth.authentication.FirebaseAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
 }
