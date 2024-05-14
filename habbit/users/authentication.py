@@ -2,7 +2,7 @@ import os
 
 import firebase_admin
 from django.conf import settings
-from django.contrib.auth.models import User
+from users.models import User
 from django.utils import timezone
 from firebase_admin import auth
 from firebase_admin import credentials
@@ -12,6 +12,10 @@ from rest_framework import exceptions
 from .exceptions import FirebaseError
 from .exceptions import InvalidAuthToken
 from .exceptions import NoAuthToken
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 cred = credentials.Certificate({
@@ -51,7 +55,6 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
         except Exception:
             raise FirebaseError()
 
-        user, created = User.objects.get_or_create(username=uid)
-        user.profile.last_activity = timezone.localtime()
+        user, _ = User.objects.get_or_create(username=uid)
 
         return (user, None)

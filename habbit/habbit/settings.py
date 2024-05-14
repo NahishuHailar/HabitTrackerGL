@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(##jo*(a%ir1!9q1mvz0mrsb^ij=uw@autsg)#qx(%-zr_kpju'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     'users',
     'manage_hab',
+    'client',
 ]
 
 MIDDLEWARE = [
@@ -149,7 +150,7 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-        #'firebase_auth.authentication.FirebaseAuthentication',
+        'users.authentication.FirebaseAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
