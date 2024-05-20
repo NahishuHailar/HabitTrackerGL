@@ -15,7 +15,7 @@ class HabitSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class HabitSerializerdates(serializers.ModelSerializer):
+class HabitDatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habit
         fields = ("update_time",)

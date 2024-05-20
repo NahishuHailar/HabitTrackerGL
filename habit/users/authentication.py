@@ -14,7 +14,6 @@ from .exceptions import NoAuthToken
 
 load_dotenv()
 
-
 cred = credentials.Certificate(
     {
         "type": "service_account",

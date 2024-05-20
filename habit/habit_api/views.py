@@ -7,7 +7,7 @@ from .serializers import (
     HabitGroupSerializer,
     UserSerializer,
     HabitSerializer,
-    HabitSerializerdates,
+    HabitDatesSerializer,
 )
 
 
@@ -57,7 +57,7 @@ class Habitdates(generics.ListAPIView):
     Read all users habit progress updates
     """
 
-    serializer_class = HabitSerializerdates
+    serializer_class = HabitDatesSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
@@ -72,7 +72,7 @@ class CurrentHabitdates(generics.ListAPIView):
     Read current users habit progress updates
     """
 
-    serializer_class = HabitSerializerdates
+    serializer_class = HabitDatesSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
