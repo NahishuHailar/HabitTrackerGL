@@ -1,5 +1,5 @@
 """
-WSGI config for habbit project.
+WSGI config for habit project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'habbit.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'habit.settings')
 
 application = get_wsgi_application()
