@@ -1,5 +1,5 @@
 """
-ASGI config for habbit project.
+ASGI config for habit project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'habbit.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'habit.settings')
 
 application = get_asgi_application()
