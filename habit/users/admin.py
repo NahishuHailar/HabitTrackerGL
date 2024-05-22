@@ -1,14 +1,23 @@
 from django.contrib import admin
-from .models import User
+from django.contrib.auth.admin import UserAdmin
+from .models import User as CustomUser
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    fields = ["username", "phone", "image", "password", "email"]
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
     list_display = (
         "id",
         "username",
-        "phone",
-        "image",
     )
-    ordering = ("email",)
+    fieldsets = (
+        *UserAdmin.fieldsets,
+        (
+            "Custom Fields",
+            {
+                "fields": (
+                    "phone",
+                    "image",
+                ),
+            },
+        ),
+    )

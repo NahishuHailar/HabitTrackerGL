@@ -6,7 +6,7 @@ from django.db import models
 from .utils import user_directory_path
 
 
-class User(AbstractUser, PermissionsMixin):
+class User(AbstractUser):
     """
     User Profile
     """
