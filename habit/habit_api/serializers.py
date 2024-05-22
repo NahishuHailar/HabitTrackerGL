@@ -7,6 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "username", "image", "email")
+        ref_name = 'CustomUserModelSerialize'
 
 
 class HabitSerializer(serializers.ModelSerializer):
@@ -18,7 +19,7 @@ class HabitSerializer(serializers.ModelSerializer):
 class HabitDatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habit
-        fields = ("update_time",)
+        fields = "__all__"
 
 
 class HabitGroupSerializer(serializers.ModelSerializer):
