@@ -31,5 +31,5 @@ class HabitGroupAdmin(admin.ModelAdmin):
 
 @admin.register(HabitProgress)
 class HabitProgressAdmin(admin.ModelAdmin):
-    fields = ["habit", "current_value"]
+    fields = ["user", "habit", "current_value"]
     list_display = ("id", "habit", "current_value", "update_time")

@@ -31,7 +31,7 @@ class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 class HabitListCreateApiView(generics.ListCreateAPIView):
     """
-    Get list of habits of current user, create new habit
+    Get list of habits of current user, create new user's habit
     """
 
     serializer_class = HabitSerializer
@@ -48,8 +48,13 @@ class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
 
     serializer_class = HabitSerializer
-    queryset = Habit.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        query_set = Habit.objects.filter(user_id=self.kwargs["uid"]).filter(
+            pk=self.kwargs["pk"]
+        )
+        return query_set
 
 
 class Habitdates(generics.ListAPIView):
@@ -61,9 +66,10 @@ class Habitdates(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        query_set = HabitProgress.objects.values("update_time").filter(
-            user=self.kwargs["pk"]
+        query_set = HabitProgress.objects.filter(user_id=self.kwargs["pk"]).order_by(
+            "habit"
         )
+
         return query_set
 
 
@@ -76,10 +82,9 @@ class CurrentHabitdates(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        query_set = (
-            HabitProgress.objects.values("update_time")
-            .filter(user=self.kwargs["pk"])
-            .filter(habit=self.kwargs["habit_id"])
+
+        query_set = HabitProgress.objects.filter(user_id=self.kwargs["pk"]).filter(
+            habit_id=self.kwargs["habit_id"]
         )
         return query_set
 
