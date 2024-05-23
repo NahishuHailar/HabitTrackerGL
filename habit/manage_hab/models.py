@@ -45,11 +45,14 @@ class HabitProgress(models.Model):
     habit = models.ForeignKey(
         Habit, on_delete=models.PROTECT, verbose_name="Привычка"
     )
+    user = models.ForeignKey(
+        User, on_delete=models.PROTECT, verbose_name="Пользователь"
+    )
     current_value = models.SmallIntegerField(verbose_name="Текущее значение")
     update_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.habit.user.username + self.habit.name
+        return self.user.username + self.habit.name
 
 
 class HabitGroup(models.Model):
