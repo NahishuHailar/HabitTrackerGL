@@ -7,7 +7,8 @@ from .models import HabitGroup, Habit, HabitProgress
 
 @admin.register(Habit)
 class HabitAdmin(admin.ModelAdmin):
-    fields = ["user", "name", "goal", "current_value", "habit_group"]
+    fields = ["user", "name", "goal", "current_value", "habit_group", "progress_status",
+        "repeat_period",]
     list_display = (
         "id",
         "user",
@@ -15,6 +16,8 @@ class HabitAdmin(admin.ModelAdmin):
         "goal",
         "current_value",
         "habit_group",
+        "progress_status",
+        "repeat_period",
     )
 
 
