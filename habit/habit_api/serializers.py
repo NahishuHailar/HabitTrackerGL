@@ -6,7 +6,7 @@ from manage_hab.models import Habit, HabitGroup, HabitProgress
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "image", "email")
+        fields = ("id", "username", "image", "email", "auth_type")
         ref_name = 'CustomUserModelSerialize'
 
 

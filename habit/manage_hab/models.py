@@ -9,20 +9,20 @@ class Habit(models.Model):
 
     # Habit status Choices
     PROGRESSSTATUS = (
-        ("ac", "active"),
-        ("ar", "archive"),
-        ("dn", "done"),
-        ("dl", "deleted"),
-        ("no", "None"),
+        ("active", "active"),
+        ("archive", "archive" ),
+        ("done", "done"),
+        ("deleted", "deleted"),
+        ("none", "none"),
     )
     REPEATPERIOD = (
-        ("da", "day"),
-        ("we", "week"),
-        ("mo", "month"),
-        ("ye", "year"),
-        ("al", "always"),
+        ("day", "day"),
+        ("week", "week"),
+        ("month", "month"),
+        ("year", "year"),
+        ("always", "always"),
     )
-
+   
     user = models.ForeignKey(
         User, on_delete=models.PROTECT, verbose_name="Пользователь"
     )
@@ -37,13 +37,13 @@ class Habit(models.Model):
     name = models.CharField(max_length=300, verbose_name="Название привычки")
     goal = models.SmallIntegerField(verbose_name="Цель")
     current_value = models.SmallIntegerField(verbose_name="Текущее значение")
-    progress_status = models.CharField(
-        max_length=20, choices=PROGRESSSTATUS, verbose_name="Статус выполнения", default="ac"
+    status = models.CharField(
+        max_length=20, choices=PROGRESSSTATUS, verbose_name="Статус выполнения", default="active"
     )
     repeat_period = models.CharField(
-        max_length=20, choices=REPEATPERIOD, verbose_name="Период повтора", default="al"
+        max_length=20, choices=REPEATPERIOD, verbose_name="Период повтора", default="always"
     )
-
+    
     def __str__(self):
         return self.name
 

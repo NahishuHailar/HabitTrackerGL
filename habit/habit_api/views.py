@@ -18,15 +18,23 @@ class CreateUser(generics.CreateAPIView):
 
     serializer_class = UserSerializer
 
+    def get_queryset(self):
+        self.kwargs['username'] = self.kwargs["email"]
+        return super().get_queryset()
+
 
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
     Read, update, delete user profile
     """
 
-    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        self.kwargs['pk'] = self.kwargs['user_id']
+        query_set = User.objects.filter(pk=self.kwargs["pk"])
+        return query_set
 
 
 class HabitListCreateApiView(generics.ListCreateAPIView):
@@ -38,7 +46,7 @@ class HabitListCreateApiView(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        query_set = Habit.objects.filter(user=self.kwargs["pk"])
+        query_set = Habit.objects.filter(user=self.kwargs["user_id"])
         return query_set
 
 
@@ -51,8 +59,9 @@ class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        query_set = Habit.objects.filter(user_id=self.kwargs["uid"]).filter(
-            pk=self.kwargs["pk"]
+        self.kwargs['pk'] = self.kwargs['habit_id']
+        query_set = Habit.objects.filter(user_id=self.kwargs["user_id"]).filter(
+            pk=self.kwargs["habit_id"]
         )
         return query_set
 
@@ -66,7 +75,7 @@ class Habitdates(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        query_set = HabitProgress.objects.filter(user_id=self.kwargs["pk"]).order_by(
+        query_set = HabitProgress.objects.filter(user_id=self.kwargs["user_id"]).order_by(
             "habit"
         )
 
@@ -82,7 +91,7 @@ class CurrentHabitdates(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-
+        self.kwargs['pk'] = self.kwargs['user_id']
         query_set = HabitProgress.objects.filter(user_id=self.kwargs["pk"]).filter(
             habit_id=self.kwargs["habit_id"]
         )
