@@ -8,6 +8,8 @@ class CustomUserAdmin(UserAdmin):
     list_display = (
         "id",
         "username",
+        "email",
+        "auth_type",
     )
     fieldsets = (
         *UserAdmin.fieldsets,
@@ -17,6 +19,7 @@ class CustomUserAdmin(UserAdmin):
                 "fields": (
                     "phone",
                     "image",
+                    "auth_type",
                 ),
             },
         ),
