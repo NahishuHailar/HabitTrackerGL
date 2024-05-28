@@ -26,9 +26,6 @@ class User(AbstractUser):
             "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
         ),
         blank=True,
-        error_messages={
-            "unique": ("A user with that username already exists."),
-        },
     )
     email = models.EmailField(verbose_name="email address", unique=True)
     phone = models.PositiveIntegerField(blank=True, null=True)
@@ -47,12 +44,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-"""
-правки habit
-user тип авторизации
-api/v1/cretaeuser/ type post auth mail user_id вернуть пользователя в любом варианте
-отправка с неверным форматом uid - 408к неверный формат Обработка ошибок
-dates по юзеру - агрегация данных закрыт или не закрыт день
-
-"""
