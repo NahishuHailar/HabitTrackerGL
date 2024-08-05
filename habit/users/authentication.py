@@ -7,13 +7,20 @@ from firebase_admin import credentials
 from rest_framework import authentication
 from dotenv import load_dotenv
 
+<<<<<<< Updated upstream
 from .exceptions import FirebaseError
 from .exceptions import InvalidAuthToken
 from .exceptions import NoAuthToken
+=======
+from users.models import User
+from .exceptions import FirebaseError, InvalidAuthToken, NoAuthToken
+>>>>>>> Stashed changes
 
 
+# Load environment variables from .env file
 load_dotenv()
 
+# Initialize Firebase credentials
 cred = credentials.Certificate(
     {
         "type": "service_account",
@@ -34,13 +41,19 @@ default_app = firebase_admin.initialize_app(cred)
 
 
 class FirebaseAuthentication(authentication.BaseAuthentication):
+    """
+    Custom authentication class for Firebase.
+    """
+
     def authenticate(self, request):
+        """
+        Authenticate the user based on the Firebase token provided in the request.
+        """
         auth_header = request.META.get("HTTP_AUTHORIZATION")
         if not auth_header:
             raise NoAuthToken("No auth token provided")
 
         id_token = auth_header.split(" ").pop()
-        decoded_token = None
         try:
             decoded_token = auth.verify_id_token(id_token)
         except Exception:
@@ -51,9 +64,21 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
 
         try:
             uid = decoded_token.get("uid")
+<<<<<<< Updated upstream
         except Exception:
             raise FirebaseError()
 
         user, _ = User.objects.get_or_create(username=uid)
 
+=======
+            email = decoded_token.get("email")
+        except Exception:
+            raise FirebaseError()
+        
+        user, _ = User.objects.get_or_create(
+            firebase_key=uid,
+            email=email,
+            auth_type="google",
+        )
+>>>>>>> Stashed changes
         return (user, None)

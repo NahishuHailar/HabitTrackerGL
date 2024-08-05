@@ -138,6 +138,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'habit_api.exception_handler.custom_exception_handler',
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "users.authentication.FirebaseAuthentication",
@@ -147,5 +148,55 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = [
     #'django.contrib.auth.backends.ModelBackend',
+<<<<<<< Updated upstream
     'users.email_auth_backend.EmailAuthBackend',
 ]
+=======
+    "users.email_auth_backend.EmailAuthBackend",
+]
+
+# For django debug toolbar
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+}
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'file': {
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+        }
+    },
+    'handlers': {
+        'file': {
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'level': 'ERROR',
+            'filename': os.path.join(BASE_DIR, 'logs/habit_api/log.log'),
+        },
+    },
+    'loggers': {
+        'habit_api': {
+            'level': 'ERROR',
+            'handlers': ['file'],
+            'propagate': True,
+        }
+    }
+}
+os.makedirs(os.path.join(BASE_DIR, 'logs/habit_api'), exist_ok=True)
+>>>>>>> Stashed changes
