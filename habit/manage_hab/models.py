@@ -1,34 +1,15 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from users.models import User
-<<<<<<< Updated upstream
-=======
 from .constants import PROGRESSSTATUS, REPEATPERIOD, TRACKTIME, COLOR
->>>>>>> Stashed changes
 
 
 class Habit(models.Model):
     """
     Сurrent user's habit.
     """
-
-    # Habit status Choices
-    PROGRESSSTATUS = (
-        ("active", "active"),
-        ("archive", "archive" ),
-        ("done", "done"),
-        ("deleted", "deleted"),
-        ("none", "none"),
-    )
-    REPEATPERIOD = (
-        ("day", "day"),
-        ("week", "week"),
-        ("month", "month"),
-        ("year", "year"),
-        ("always", "always"),
-    )
-   
     user = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name="Пользователь"
+        User, on_delete=models.PROTECT, verbose_name="Пользователь", db_index=True,
     )
     habit_group = models.ForeignKey(
         "HabitGroup",
@@ -38,24 +19,16 @@ class Habit(models.Model):
         default=None,
         verbose_name="Группа привычки",
     )
-<<<<<<< Updated upstream
-    name = models.CharField(max_length=300, verbose_name="Название привычки")
-    goal = models.SmallIntegerField(verbose_name="Цель")
-    current_value = models.SmallIntegerField(verbose_name="Текущее значение")
-=======
     name = models.CharField(max_length=50, verbose_name="Название привычки", blank=True, null=True)
     goal = models.SmallIntegerField(verbose_name="Цель", blank=True, null=True)
     current_value = models.SmallIntegerField(verbose_name="Текущее значение", blank=True, null=True)
->>>>>>> Stashed changes
     status = models.CharField(
         max_length=20, choices=PROGRESSSTATUS, verbose_name="Статус выполнения", default="active"
     )
     repeat_period = models.CharField(
         max_length=20, choices=REPEATPERIOD, verbose_name="Период повтора", default="always"
     )
-<<<<<<< Updated upstream
     
-=======
     icon = models.CharField(max_length=20, verbose_name="Иконка", blank=True, null=True)
     track_time = models.CharField(    # For a daily habit (morning, noon, evening)
         max_length=20,
@@ -74,7 +47,6 @@ class Habit(models.Model):
     update_time = models.DateField(verbose_name="Дата обновления", auto_now=True)
 
 
->>>>>>> Stashed changes
     def __str__(self):
         return self.name
 
@@ -91,9 +63,6 @@ class HabitProgress(models.Model):
         User, on_delete=models.PROTECT, verbose_name="Пользователь"
     )
     current_value = models.SmallIntegerField(verbose_name="Текущее значение")
-<<<<<<< Updated upstream
-    update_time = models.DateTimeField(auto_now=True)
-=======
     # if habit.repeat_period == "always" - current_goal=Null
     current_goal = models.SmallIntegerField(verbose_name="Цель", null=True, blank=True)
     # For habits with a repeat period of a week/month/year
@@ -104,14 +73,11 @@ class HabitProgress(models.Model):
         verbose_name="Сроки" 
     )
     update_time = models.DateField(auto_now=True)
->>>>>>> Stashed changes
 
     def __str__(self):
         return self.user.username + self.habit.name
 
 
-<<<<<<< Updated upstream
-=======
 class HabitHistory(models.Model):
     """
     General activity history for each habit.
@@ -135,13 +101,40 @@ class HabitHistory(models.Model):
         return f"История {self.user.username} {self.habit.name}"   
 
 
->>>>>>> Stashed changes
 class HabitGroup(models.Model):
     """
     habit group. A habit may not have a group
     """
 
     name = models.CharField(max_length=300, verbose_name="Название группы")
+    color = models.CharField(
+        max_length=20,
+        choices=COLOR,
+        default="green",
+        verbose_name="Цвет группы"
+    )
 
     def __str__(self):
         return self.name
+
+
+class Icon(models.Model):
+    """
+    list of icons app.
+    """
+
+    name = models.CharField(
+        max_length=50, verbose_name="Название иконки", db_index=True
+    )
+    emoji_name = models.CharField(
+        max_length=50, verbose_name="Название эмодзи",
+    ) 
+    habit_group = models.ForeignKey(
+        HabitGroup,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="Группа привычки",
+    )
+    

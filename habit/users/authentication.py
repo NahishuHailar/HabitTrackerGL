@@ -7,14 +7,8 @@ from firebase_admin import credentials
 from rest_framework import authentication
 from dotenv import load_dotenv
 
-<<<<<<< Updated upstream
-from .exceptions import FirebaseError
-from .exceptions import InvalidAuthToken
-from .exceptions import NoAuthToken
-=======
 from users.models import User
 from .exceptions import FirebaseError, InvalidAuthToken, NoAuthToken
->>>>>>> Stashed changes
 
 
 # Load environment variables from .env file
@@ -64,13 +58,6 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
 
         try:
             uid = decoded_token.get("uid")
-<<<<<<< Updated upstream
-        except Exception:
-            raise FirebaseError()
-
-        user, _ = User.objects.get_or_create(username=uid)
-
-=======
             email = decoded_token.get("email")
         except Exception:
             raise FirebaseError()
@@ -80,5 +67,4 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             email=email,
             auth_type="google",
         )
->>>>>>> Stashed changes
         return (user, None)

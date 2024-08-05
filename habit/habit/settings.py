@@ -148,10 +148,6 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = [
     #'django.contrib.auth.backends.ModelBackend',
-<<<<<<< Updated upstream
-    'users.email_auth_backend.EmailAuthBackend',
-]
-=======
     "users.email_auth_backend.EmailAuthBackend",
 ]
 
@@ -199,4 +195,3 @@ LOGGING = {
     }
 }
 os.makedirs(os.path.join(BASE_DIR, 'logs/habit_api'), exist_ok=True)
->>>>>>> Stashed changes

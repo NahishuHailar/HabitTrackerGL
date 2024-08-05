@@ -1,6 +1,11 @@
 from rest_framework import serializers
-from users.models import User
-from manage_hab.models import Habit, HabitGroup, HabitProgress
+from users.models import User, UserAvatar
+from manage_hab.models import (
+    Habit, 
+    HabitGroup, 
+    HabitProgress, 
+    Icon
+    )
 
 
 class GetUserSerializer(serializers.ModelSerializer):
@@ -12,11 +17,6 @@ class GetUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-<<<<<<< Updated upstream
-        fields = ("id", "username", "image", "email", "auth_type")
-        ref_name = 'CustomUserModelSerialize'
-
-=======
         fields = "__all__"
         ref_name = 'CustomUserModelSerialize'
 
@@ -38,15 +38,12 @@ class UserSerializer(serializers.ModelSerializer):
             return super().to_internal_value(data_copy)
     
 
->>>>>>> Stashed changes
 
 class HabitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habit
         fields = "__all__"
 
-<<<<<<< Updated upstream
-=======
     def to_representation(self, instance):
         rep = super(HabitSerializer, self).to_representation(instance)
         if instance.habit_group:
@@ -64,7 +61,6 @@ class HabitSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError("Habit group does not exist.")
             return super().to_internal_value(data_copy)
 
->>>>>>> Stashed changes
 
 class HabitDatesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,3 +72,18 @@ class HabitGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = HabitGroup()
         fields = ("name",)
+
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAvatar
+        fields = "__all__"
+
+class IconSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Icon
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        rep = super(IconSerializer, self).to_representation(instance)
+        rep['habit_group'] = instance.habit_group.name
+        return rep
