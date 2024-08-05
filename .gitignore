@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 # Media/Statis
-media/
+**/media/
 static/
 # Distribution / packaging
 **/migrations/
