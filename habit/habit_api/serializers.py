@@ -71,7 +71,7 @@ class HabitDatesSerializer(serializers.ModelSerializer):
 class HabitGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = HabitGroup()
-        fields = ("name",)
+        fields = "__all__"
 
 class AvatarSerializer(serializers.ModelSerializer):
     class Meta:
