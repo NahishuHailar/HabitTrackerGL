@@ -11,7 +11,7 @@ def custom_exception_handler(exc, context):
     # to get the standard error response.
     response = drf_exception_handler(exc, context)
 
-    # Now add the logging of the exception
+    # Add the logging of the exception
     if response is not None:
         logger.error(f"Exception: {exc} - Context: {context}")
 
