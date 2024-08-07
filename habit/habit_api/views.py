@@ -203,3 +203,5 @@ class CommonHabitProgressAPIView(APIView):
         return Response(common_progress_calendar)
 
 
+def get_error(*args, **kwargs):
+    raise ValueError
