@@ -1,11 +1,10 @@
 import os
+from dotenv import load_dotenv
 
 import firebase_admin
-from users.models import User
 from firebase_admin import auth
 from firebase_admin import credentials
 from rest_framework import authentication
-from dotenv import load_dotenv
 
 from users.models import User
 from .exceptions import FirebaseError, InvalidAuthToken, NoAuthToken
@@ -48,6 +47,7 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             raise NoAuthToken("No auth token provided")
 
         id_token = auth_header.split(" ").pop()
+        decoded_token = None
         try:
             decoded_token = auth.verify_id_token(id_token)
         except Exception:
