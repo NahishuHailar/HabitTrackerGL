@@ -54,7 +54,7 @@ class User(AbstractUser):
     )
 
     def __str__(self):
-        return self.username
+        return self.username or "Name isn't set"
 
 class UserAvatar(models.Model):
     """
