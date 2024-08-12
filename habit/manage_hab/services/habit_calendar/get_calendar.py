@@ -43,7 +43,7 @@ def get_common_progress_calendar(user_id):
                    habits: ['yellow', 'yellow', 'yellow'] --> yellow (all - yellow)
     """
     # A list of all the user's active habits
-    habit_list = Habit.objects.filter(user=user_id)
+    habit_list = Habit.active.filter(user=user_id)
     all_calendars = []
     
     # Summary list of results for each individual active habit

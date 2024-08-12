@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from users.models import User
 from .constants import PROGRESSSTATUS, REPEATPERIOD, TRACKTIME, COLOR
+from .services.manager import ActiveHabitManager
 
 
 class Habit(models.Model):
@@ -45,6 +46,9 @@ class Habit(models.Model):
     start_day = models.DateTimeField(verbose_name="Дата начала", auto_now_add=True)
 
     update_time = models.DateField(verbose_name="Дата обновления", auto_now=True)
+
+    objects = models.Manager()  # The default manager
+    active = ActiveHabitManager()  # Manager for only active habits
 
 
     def __str__(self):

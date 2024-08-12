@@ -68,7 +68,7 @@ class HabitListCreateAPIView(generics.ListCreateAPIView):
     def get_queryset(self):
         if local_time := self.request.META.get('HTTP_LOCAL_TIME', None):   
             reset_habits_counters(self.kwargs["user_id"], local_time)    
-        return Habit.objects.filter(user=self.kwargs["user_id"], status="active")
+        return Habit.active.filter(user=self.kwargs["user_id"])
 
 
 class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
