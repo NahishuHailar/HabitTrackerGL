@@ -10,24 +10,30 @@ def reset_habits_counters(user_id, local_time_str):
     Reset the counters of the current value of habits every new day, week, month, or year.
     """
     local_time = datetime.fromisoformat(local_time_str).date()
-    habits = Habit.objects.filter(user_id=user_id, status="active")
+    habits = Habit.active.filter(user_id=user_id)
     
     for habit in habits:
+        # Daily reset
         if habit.repeat_period == "day":
-            reset_habit(habit, local_time, timedelta(days=1))
+            if habit.update_time + timedelta(days=1) <= local_time:
+                reset_current_value(habit)
+        # Weekly reset
         elif habit.repeat_period == "week":
-            reset_habit(habit, local_time, timedelta(weeks=1))
+            if habit.update_time.isocalendar()[1] != local_time.isocalendar()[1]:
+                reset_current_value(habit)
+        # Monthly reset        
         elif habit.repeat_period == "month":
             if habit.update_time.month != local_time.month or habit.update_time.year != local_time.year:
-                habit.current_value = 0
-                habit.save()
+                reset_current_value(habit)
+        # Annual reset
         elif habit.repeat_period == "year":
             if habit.update_time.year != local_time.year:
-                habit.current_value = 0
-                habit.save()
+               reset_current_value(habit)
 
-def reset_habit(habit, local_time, time_delta):
-    if habit.update_time + time_delta <= local_time:
-        habit.current_value = 0
-        habit.save()
 
+def reset_current_value(habit):
+    """
+    Reset the current value of a habit to 0 and save the habit.
+    """
+    habit.current_value = 0
+    habit.save()
