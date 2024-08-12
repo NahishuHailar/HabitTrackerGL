@@ -26,5 +26,5 @@ def get_daily_habit_progress(user_id, habit_id, start_day, end_day):
         elif record['max_value'] > 0:
             progress_dict[date_str] = "yellow"
 
-    result = [{date: progress_dict[date]} for date in sorted(progress_dict.keys())]
+    result = dict(sorted(progress_dict.items()))
     return result

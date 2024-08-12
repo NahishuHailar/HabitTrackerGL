@@ -3,7 +3,7 @@ Creating a calendar for a habit with year repeat period
 """
 
 from collections import defaultdict
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.db.models import Max
 
@@ -50,11 +50,11 @@ def get_yearly_habit_progress(user_id, habit_id, start_day, end_day):
         progress_dates = progress_by_year[(start_year, end_year)]
 
         # Creating a list of deadlines for the current year
-        year_due_dates = [(start_year + timedelta(days=n)).strftime('%Y-%m-%d') for n in numbers_due_dates]
+        year_due_dates = [start_year + timedelta(days=n) for n in numbers_due_dates]
 
         # Deleting the nearest deadline for each tracking habit
         for date in progress_dates:
-            result[date.strftime('%Y-%m-%d')] = 'green'
+            result[date] = 'green'
             if year_due_dates:
                 year_due_dates.pop(0)
         
@@ -62,9 +62,11 @@ def get_yearly_habit_progress(user_id, habit_id, start_day, end_day):
         for date in year_due_dates:
             if date not in result:
                 result[date] = 'yellow'
-
-    sorted_result = sorted(result.items())
-    return [{date: color} for date, color in sorted_result]
+    result = {
+        datetime.strftime(key, '%Y-%m-%d'): value 
+        for key, value in sorted(result.items()) if key >= start_day
+        }
+    return result
 
 
 def get_year_periods(start_day, end_day):

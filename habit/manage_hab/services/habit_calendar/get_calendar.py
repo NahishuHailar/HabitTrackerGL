@@ -52,8 +52,7 @@ def get_common_progress_calendar(user_id):
     
     combined_values = defaultdict(list)
     for habit_calendar in all_calendars:
-        for current_calendar in habit_calendar:
-            for date, color in current_calendar.items():
+            for date, color in habit_calendar.items():
                 combined_values[date].append(color)
 
     common_calendar = {}

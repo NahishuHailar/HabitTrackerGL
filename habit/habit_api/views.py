@@ -201,7 +201,3 @@ class CommonHabitProgressAPIView(APIView):
     def get(self, requet, user_id):
         common_progress_calendar = get_common_progress_calendar(user_id=user_id)
         return Response(common_progress_calendar)
-
-
-def get_error(*args, **kwargs):
-    raise ValueError

@@ -12,7 +12,6 @@ from .views import (GetUserAPIView,
     HabitProgressAPIView,
     CommonHabitProgressAPIView,
     IconListListAPIView,
-    get_error
 )
 
 urlpatterns = [
@@ -34,5 +33,4 @@ urlpatterns = [
     path("api/v1/icons/", IconListListAPIView.as_view(), name='icon_list'),
     path("api/v1/progress/<uuid:user_id>/<int:habit_id>/", HabitProgressAPIView.as_view(), name='habit_progress'),
     path("api/v1/commonprogress/<uuid:user_id>/", CommonHabitProgressAPIView.as_view(), name='common_habit_progress'),
-    path("api/v1/sentry/", get_error)
 ]
