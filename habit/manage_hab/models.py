@@ -61,7 +61,7 @@ class HabitProgress(models.Model):
     """
 
     habit = models.ForeignKey(
-        Habit, on_delete=models.PROTECT, verbose_name="Привычка"
+        Habit, on_delete=models.CASCADE, verbose_name="Привычка"
     )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="Пользователь"
@@ -88,7 +88,7 @@ class HabitHistory(models.Model):
     Accounting for the total time of a habit in the active/archive status
     """
     habit = models.ForeignKey(
-        Habit, on_delete=models.PROTECT, verbose_name="Привычка", db_index=True
+        Habit, on_delete=models.CASCADE, verbose_name="Привычка", db_index=True
     )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="Пользователь", db_index=True
