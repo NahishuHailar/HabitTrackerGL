@@ -10,7 +10,7 @@ class Habit(models.Model):
     Сurrent user's habit.
     """
     user = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name="Пользователь", db_index=True,
+        User, on_delete=models.CASCADE, verbose_name="Пользователь", db_index=True,
     )
     habit_group = models.ForeignKey(
         "HabitGroup",
@@ -64,7 +64,7 @@ class HabitProgress(models.Model):
         Habit, on_delete=models.PROTECT, verbose_name="Привычка"
     )
     user = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name="Пользователь"
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
     )
     current_value = models.SmallIntegerField(verbose_name="Текущее значение")
     # if habit.repeat_period == "always" - current_goal=Null
@@ -91,7 +91,7 @@ class HabitHistory(models.Model):
         Habit, on_delete=models.PROTECT, verbose_name="Привычка", db_index=True
     )
     user = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name="Пользователь", db_index=True
+        User, on_delete=models.CASCADE, verbose_name="Пользователь", db_index=True
     )
     date = models.DateField(verbose_name="Дата")
     status = models.CharField(

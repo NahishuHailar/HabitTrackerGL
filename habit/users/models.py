@@ -26,7 +26,7 @@ class User(AbstractUser):
     )
     avatar = models.ForeignKey(
         "UserAvatar",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE
         blank=True,
         null=True,
         verbose_name="Фото_профиля",
