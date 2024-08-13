@@ -5,6 +5,7 @@ the Habit.current_value must be reset to zero
 from datetime import datetime, timedelta
 from manage_hab.models import Habit
 
+
 def reset_habits_counters(user_id, local_time_str):
     """
     Reset the counters of the current value of habits every new day, week, month, or year.
