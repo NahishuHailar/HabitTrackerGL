@@ -59,12 +59,22 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
         try:
             uid = decoded_token.get("uid")
             email = decoded_token.get("email")
+            username = decoded_token.get("name") 
         except Exception:
             raise FirebaseError()
         
-        user, _ = User.objects.get_or_create(
+        # Get or create the user
+        user, created = User.objects.get_or_create(
             firebase_key=uid,
-            email=email,
-            auth_type="google",
+            defaults={
+                'email': email,
+                'auth_type': 'google',
+                'username': username
+            }
         )
+
+        # Update the username if the user was not created before
+        if not created and not user.username:
+            user.username = username
+            user.save()
         return (user, None)
