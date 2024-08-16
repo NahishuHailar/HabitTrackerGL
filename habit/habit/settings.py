@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = "django-insecure-(##jo*(a%ir1!9q1mvz0mrsb^ij=uw@autsg)#qx(%-zr_kpju
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1",  os.environ.get("ALLOWED_HOST"), 'dev.api.glossy.sealclass.com']
+ALLOWED_HOSTS = ["127.0.0.1",  os.environ.get("ALLOWED_HOST")]
 
 
 # Application definition
@@ -79,7 +80,6 @@ WSGI_APPLICATION = "habit.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-load_dotenv()
 
 DATABASES = DATABASES = {
     "default": {
