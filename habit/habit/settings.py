@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-(##jo*(a%ir1!9q1mvz0mrsb^ij=uw@autsg)#qx(%-zr_kpju
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["185.156.42.238", "127.0.0.1", "dev.api.glossy.sealclass.com"]
+ALLOWED_HOSTS = ["127.0.0.1",  os.environ.get("ALLOWED_HOST")]
 
 
 # Application definition
