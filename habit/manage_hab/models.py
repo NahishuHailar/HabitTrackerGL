@@ -28,8 +28,7 @@ class Habit(models.Model):
     )
     repeat_period = models.CharField(
         max_length=20, choices=REPEATPERIOD, verbose_name="Период повтора", default="always"
-    )
-    
+    )    
     icon = models.CharField(max_length=20, verbose_name="Иконка", blank=True, null=True)
     track_time = models.CharField(    # For a daily habit (morning, noon, evening)
         max_length=20,
@@ -44,8 +43,10 @@ class Habit(models.Model):
         verbose_name="Сроки", 
     )
     start_day = models.DateTimeField(verbose_name="Дата начала", auto_now_add=True)
-
     update_time = models.DateField(verbose_name="Дата обновления", auto_now=True)
+    paid = models.BooleanField(verbose_name='Платная привычка', default=False)
+
+
 
     objects = models.Manager()  # The default manager
     active = ActiveHabitManager()  # Manager for only active habits
