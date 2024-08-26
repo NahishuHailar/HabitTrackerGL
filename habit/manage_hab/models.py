@@ -141,7 +141,7 @@ class Icon(models.Model):
         default=None,
         verbose_name="Группа привычки",
     )
-   # paid = models.BooleanField(verbose_name='Платная привычка', default=False)
+    paid = models.BooleanField(verbose_name='Платная эмодзи', default=False)
 
     def __str__(self):
         return self.name

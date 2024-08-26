@@ -63,7 +63,7 @@ class UserAvatar(models.Model):
     color = models.CharField(
         max_length=20, choices=COLOR, default="green", verbose_name="Цвет аватара"
     )
-   # paid = models.BooleanField(verbose_name="Платная привычка", default=False)
+    paid = models.BooleanField(verbose_name="Платная аватар", default=False)
 
     def __str__(self):
         return self.title
