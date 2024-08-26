@@ -30,6 +30,7 @@ class CustomUserAdmin(UserAdmin):
                     "avatar",
                     "auth_type",
                     "firebase_key",
+                    "fcm_key",
                     "color",
                     "gender",
                 ),
@@ -41,4 +42,4 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(UserAvatar)
 class UserAvatarAdmin(admin.ModelAdmin):
     fields = ["title", "image_url", "color" ]
-    list_display = ("id", "title", "image_url", "color")
+    list_display = ("id", "title", "image_url", "color", "paid")
