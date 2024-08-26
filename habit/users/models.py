@@ -5,7 +5,7 @@ from django.db import models
 
 from .constants import AUTHTYPE, GENDER
 from manage_hab.constants import COLOR
-from .utils import user_directory_path # ЗАГРУЗКА ПОЛЬЗОВАТЕЛЬСКОГО ИЗОБРАЖЕНИЯ
+from .utils import user_directory_path  # ЗАГРУЗКА ПОЛЬЗОВАТЕЛЬСКОГО ИЗОБРАЖЕНИЯ
 
 
 class User(AbstractUser):
@@ -15,7 +15,8 @@ class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, db_index=True)
     firebase_key = models.CharField(max_length=32, blank=True, null=True)
-    username = models.CharField( max_length=150, unique=False, blank=True, null=True)
+    fcm_key = models.CharField(max_length=255, blank=True, null=True)
+    username = models.CharField(max_length=150, unique=False, blank=True, null=True)
     email = models.EmailField()
     phone = models.PositiveIntegerField(blank=True, null=True)
     image = models.CharField(
@@ -43,18 +44,13 @@ class User(AbstractUser):
         null=True,
         blank=True,
         default="green",
-       )
-
-    gender = models.CharField(
-        max_length=20,
-        choices=GENDER,
-        null=True,
-        blank=True
-
     )
+
+    gender = models.CharField(max_length=20, choices=GENDER, null=True, blank=True)
 
     def __str__(self):
         return self.username or "Name isn't set"
+
 
 class UserAvatar(models.Model):
     """
@@ -65,11 +61,9 @@ class UserAvatar(models.Model):
     image_url = models.URLField(max_length=200, verbose_name="url изображения")
 
     color = models.CharField(
-        max_length=20,
-        choices=COLOR,
-        default="green",
-        verbose_name="Цвет аватара"
+        max_length=20, choices=COLOR, default="green", verbose_name="Цвет аватара"
     )
+   # paid = models.BooleanField(verbose_name="Платная привычка", default=False)
 
     def __str__(self):
         return self.title

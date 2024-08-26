@@ -7,4 +7,5 @@ class ManageHabConfig(AppConfig):
 
     def ready(self):
         import habit_api.services.cache_signals
+        import manage_hab.signals
 

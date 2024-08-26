@@ -63,17 +63,26 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
         except Exception:
             raise FirebaseError()
         
+        
+        fcm_key = request.META.get("FCM_TOKEN")
+
         # Get or create the user
         user, created = User.objects.get_or_create(
             firebase_key=uid,
             defaults={
                 'email': email,
                 'auth_type': 'google',
-                'username': username
+                'username': username,
+                'fcm_key': fcm_key
+
             }
         )
 
         # Update the username if the user was not created before
+        if not user.fcm_key or user.fcm_key != fcm_key:
+            user.fcm_key = fcm_key
+            user.save()
+
         if not created and not user.username:
             user.username = username
             user.save()

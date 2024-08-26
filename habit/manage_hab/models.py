@@ -44,7 +44,6 @@ class Habit(models.Model):
     )
     start_day = models.DateTimeField(verbose_name="Дата начала", auto_now_add=True)
     update_time = models.DateField(verbose_name="Дата обновления", auto_now=True)
-    paid = models.BooleanField(verbose_name='Платная привычка', default=False)
 
 
 
@@ -142,4 +141,7 @@ class Icon(models.Model):
         default=None,
         verbose_name="Группа привычки",
     )
-    
+   # paid = models.BooleanField(verbose_name='Платная привычка', default=False)
+
+    def __str__(self):
+        return self.name
