@@ -64,7 +64,7 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             raise FirebaseError()
         
         
-        fcm_key = request.META.get("FCM_TOKEN")
+        fcm_key = request.META.get("HTTP_FCMTOKEN")
 
         # Get or create the user
         user, created = User.objects.get_or_create(
