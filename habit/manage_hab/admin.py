@@ -57,7 +57,7 @@ class HabitHistoryAdmin(admin.ModelAdmin):
 
 @admin.register(Icon)
 class IconAdmin(admin.ModelAdmin):
-    fields = ["name", "emoji_name", "habit_group"]
+    fields = ["name", "emoji_name", "habit_group", "paid"]
     list_display = ("id", "name", "emoji_name", "habit_group", "paid" )
 
     

@@ -41,5 +41,5 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(UserAvatar)
 class UserAvatarAdmin(admin.ModelAdmin):
-    fields = ["title", "image_url", "color" ]
+    fields = ["title", "image_url", "color", "paid" ]
     list_display = ("id", "title", "image_url", "color", "paid")

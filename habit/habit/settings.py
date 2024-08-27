@@ -189,7 +189,7 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'logs/habit_api/log.log'),
         },
         'sentry': {
-            'level': 'ERROR',  # Capture errors and above
+            'level': 'ERROR',  
             'class': 'sentry_sdk.integrations.logging.EventHandler',
             'formatter': 'file',
         },
@@ -205,6 +205,10 @@ LOGGING = {
             'handlers': ['file', 'sentry'],
             'propagate': True,
         },
+        'celery_tasks': {  
+            'handlers': ['file', 'sentry'],
+            'propagate': True,
+        },    
         'root': {
             'level': 'ERROR',
             'handlers': ['file', 'sentry'],
