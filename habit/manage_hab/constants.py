@@ -17,6 +17,12 @@ COLOR = (
     ("green", "green"),
     ("blue", "blue"),
     ("purple", "purple"),
+    ("orange", "orange"),
+    ("teal", "teal"),
+    ("pink", "pink"),
+    ("cyan", "cyan"),
+    ("brown", "brown"),
+    ("lightGreen", "lightGreen"),
 )
 TRACKTIME = (
     ("all_day", "all_day"),
