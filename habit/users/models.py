@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
-from .constants import AUTHTYPE, GENDER
+from .constants import AUTHTYPE, AVATAR_GROUP, GENDER
 from manage_hab.constants import COLOR
 from .utils import user_directory_path  # ЗАГРУЗКА ПОЛЬЗОВАТЕЛЬСКОГО ИЗОБРАЖЕНИЯ
 
@@ -58,6 +58,14 @@ class UserAvatar(models.Model):
     """
 
     title = models.CharField(max_length=300, verbose_name="Название", db_index=True)
+    product_id = models.CharField(max_length=100, verbose_name="product id", default="_")
+    avatar_group = models.ForeignKey(
+        "AvatarGroup",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name="Группа автара",
+    )
     image_url = models.URLField(max_length=200, verbose_name="url изображения")
 
     color = models.CharField(
@@ -67,3 +75,21 @@ class UserAvatar(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class AvatarGroup(models.Model):
+    """
+    Group of avatars.
+    """
+    name = models.CharField(
+        max_length=50,
+        choices=AVATAR_GROUP,
+        verbose_name="Группа Аватара")
+    product_id = models.CharField(
+        max_length=100,
+        verbose_name="product id",
+        default="_",
+        )
+
+    def __str__(self):
+        return self.name

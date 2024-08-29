@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User as CustomUser
-from .models import UserAvatar
+from .models import UserAvatar, AvatarGroup
 
 
 @admin.register(CustomUser)
@@ -41,5 +41,12 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(UserAvatar)
 class UserAvatarAdmin(admin.ModelAdmin):
-    fields = ["title", "image_url", "color", "paid" ]
-    list_display = ("id", "title", "image_url", "color", "paid")
+    fields = ["title","product_id","avatar_group", "image_url", "color", "paid" ]
+    list_display = ("id", "title","product_id","avatar_group", "image_url", "color", "paid")
+
+
+
+@admin.register(AvatarGroup)
+class AvatarGroupAdmin(admin.ModelAdmin):
+    fields = ["name","product_id" ]
+    list_display = ("id", "name", "product_id")
