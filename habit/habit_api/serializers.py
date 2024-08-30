@@ -77,6 +77,12 @@ class AvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAvatar
         fields = "__all__"
+    
+    def to_representation(self, instance):
+        rep = super(AvatarSerializer, self).to_representation(instance)
+        if instance.avatar_group:
+            rep['avatar_group'] = instance.avatar_group.name
+        return rep    
 
 class IconSerializer(serializers.ModelSerializer):
     class Meta:

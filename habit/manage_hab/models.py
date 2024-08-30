@@ -117,6 +117,8 @@ class HabitGroup(models.Model):
         default="green",
         verbose_name="Цвет группы"
     )
+    product_id = models.CharField(max_length=100, verbose_name="product id", default="_")
+
 
     def __str__(self):
         return self.name
