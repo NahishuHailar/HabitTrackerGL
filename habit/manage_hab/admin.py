@@ -39,8 +39,8 @@ class HabitAdmin(admin.ModelAdmin):
 
 @admin.register(HabitGroup)
 class HabitGroupAdmin(admin.ModelAdmin):
-    fields = ["name", "color"]
-    list_display = ("id", "name", "color",)
+    fields = ["name", "color", "product_id"]
+    list_display = ("id", "name", "color", "product_id")
 
 
 @admin.register(HabitProgress)
