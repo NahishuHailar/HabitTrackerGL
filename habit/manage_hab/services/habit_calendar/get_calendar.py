@@ -13,24 +13,24 @@ from .mothly_calendar import get_monthly_habit_progress
 from .annual_calendar import get_yearly_habit_progress
 from .always_calendar import get_always_habit_progress
 
-def get_progress_calendar(user_id, habit_id):
+def get_progress_calendar(user_id, habit_id, pagination):
     """
     Get progress by habit depending on the type of habit.
     Daily/Weekly/Monthly/Annual/Always
     """
     habit = Habit.objects.get(user_id=user_id, id=habit_id)
     start_day = habit.start_day.replace(tzinfo=None).date()
-    today = datetime.today().date()
+    end_day = datetime.today().date()
     if habit.repeat_period == 'day':
-        return get_daily_habit_progress(user_id, habit_id, start_day, today)
+        return get_daily_habit_progress(user_id, habit_id, start_day, end_day, pagination)
     elif habit.repeat_period == 'week':
-        return get_weekly_habit_progress(user_id, habit_id, start_day, today)
+        return get_weekly_habit_progress(user_id, habit_id, start_day, end_day, pagination)
     elif habit.repeat_period == 'month':
-        return get_monthly_habit_progress(user_id, habit_id, start_day, today)
+        return get_monthly_habit_progress(user_id, habit_id, start_day, end_day, pagination)
     elif habit.repeat_period == 'year':
-        return get_yearly_habit_progress(user_id, habit_id, start_day, today)
+        return get_yearly_habit_progress(user_id, habit_id, start_day, end_day, pagination)
     elif habit.repeat_period == 'always':
-        return get_always_habit_progress(user_id, habit_id, start_day, today)
+        return get_always_habit_progress(user_id, habit_id, start_day, end_day, pagination)
     else:
         return []
 

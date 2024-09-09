@@ -198,9 +198,12 @@ class HabitProgressAPIView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, user_id, habit_id):
+        pagination = int(request.query_params.get('pagination', 1)) 
         progress_calendar = get_progress_calendar(
-            user_id=user_id,habit_id=habit_id
-            )
+            user_id=user_id, 
+            habit_id=habit_id, 
+            pagination=pagination
+        )
         return Response(progress_calendar)
 
 
