@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.urls import reverse
 
 from manage_hab.models import Icon, HabitGroup
-from users.models import UserAvatar
+from users.models import UserAvatar, AvatarGroup
 
 
 def clear_view_cache(view_name, args=None):
@@ -23,7 +23,7 @@ def clear_view_cache(view_name, args=None):
 @receiver(post_save, sender=HabitGroup)
 @receiver(post_delete, sender=HabitGroup)
 def clear_habit_group_cache(sender, **kwargs):
-    clear_view_cache("habit_groups")
+    clear_view_cache("avatargroup_list")
 
 
 @receiver(post_save, sender=Icon)
@@ -35,4 +35,11 @@ def clear_icon_cache(sender, **kwargs):
 @receiver(post_save, sender=UserAvatar)
 @receiver(post_delete, sender=UserAvatar)
 def clear_avatar_cache(sender, **kwargs):
+    clear_view_cache("avatar_list")
+
+
+
+@receiver(post_save, sender=AvatarGroup)
+@receiver(post_delete, sender=AvatarGroup)
+def clear_avatar_group_cache(sender, **kwargs):
     clear_view_cache("avatar_list")

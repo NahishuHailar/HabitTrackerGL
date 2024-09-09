@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import User, UserAvatar
+from users.models import User, UserAvatar, AvatarGroup
 from manage_hab.models import (
     Habit, 
     HabitGroup, 
@@ -62,6 +62,8 @@ class HabitSerializer(serializers.ModelSerializer):
             return super().to_internal_value(data_copy)
 
 
+
+
 class HabitDatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = HabitProgress
@@ -70,8 +72,15 @@ class HabitDatesSerializer(serializers.ModelSerializer):
 
 class HabitGroupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = HabitGroup()
+        model = HabitGroup
         fields = "__all__"
+
+
+class AvatarGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AvatarGroup
+        fields = "__all__"        
+
 
 class AvatarSerializer(serializers.ModelSerializer):
     class Meta:

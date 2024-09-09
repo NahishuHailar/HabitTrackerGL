@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
-from users.models import User, UserAvatar
+from users.models import User, UserAvatar, AvatarGroup
 from manage_hab.models import Habit, HabitProgress, HabitGroup, Icon
 from .serializers import (
     HabitGroupSerializer,
@@ -15,6 +15,7 @@ from .serializers import (
     HabitDatesSerializer,
     AvatarSerializer,
     IconSerializer,
+    AvatarGroupSerializer,
 )
 from .utils import get_user_cred
 from manage_hab.services.habit_counters import reset_habits_counters
@@ -176,6 +177,18 @@ class IconListListAPIView(generics.ListAPIView):
     queryset = Icon.objects.all()
     serializer_class = IconSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+
+@method_decorator(cache_page(30), name='dispatch')
+class AvatarGroupListAPIView(generics.ListAPIView):
+    """
+    Read all habit groups
+    """
+
+    queryset = AvatarGroup.objects.all()
+    serializer_class = AvatarGroupSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
 
 
 class HabitProgressAPIView(APIView):
