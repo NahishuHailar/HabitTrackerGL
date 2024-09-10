@@ -35,7 +35,7 @@ def get_progress_calendar(user_id, habit_id, pagination):
         return []
 
 
-def get_common_progress_calendar(user_id):
+def get_common_progress_calendar(user_id, pagination=0):
     """
     Overall result for each habit for each day.
     For every day: habits: ['green', 'green', 'green'] --> green (all - green)
@@ -48,7 +48,7 @@ def get_common_progress_calendar(user_id):
     
     # Summary list of results for each individual active habit
     for habit in habit_list:
-        all_calendars.append(get_progress_calendar(user_id=user_id, habit_id=habit.id))
+        all_calendars.append(get_progress_calendar(user_id=user_id, habit_id=habit.id, pagination=pagination))
     
     combined_values = defaultdict(list)
     for habit_calendar in all_calendars:
