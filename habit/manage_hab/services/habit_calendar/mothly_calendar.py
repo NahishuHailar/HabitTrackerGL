@@ -10,10 +10,12 @@ from django.db.models import Max
 
 from manage_hab.models import HabitProgress, Habit
 from manage_hab.services.due_dates import get_numbers_of_due_dates
+from manage_hab.services.month_range import get_month_range
 
 
 
-def get_monthly_habit_progress(user_id, habit_id, start_day, end_day):
+
+def get_monthly_habit_progress(user_id, habit_id, start_day, end_day, pagination=0):
     """
     We work separately with each reporting month of a given period.
     For each week :
@@ -23,8 +25,29 @@ def get_monthly_habit_progress(user_id, habit_id, start_day, end_day):
     day of the current month
     """
     habit = Habit.objects.get(id=habit_id, user_id=user_id)
+
+
     # Creating a list of months for the reporting period
-    month_periods = get_month_periods(start_day, end_day)
+     # Determine the date of the first and last day of the month based on pagination
+    first_day_of_month, last_day_of_month = get_month_range(end_day, pagination)
+
+    # If the month specified in the pagination coincides with the month of the habit start,
+    # check that the start date is not earlier than the start of the habit
+
+    if (
+        start_day.year == first_day_of_month.year
+        and start_day.month == first_day_of_month.month
+    ):
+        if start_day > first_day_of_month:
+            first_day_of_month = start_day
+
+    # If this is the current month, we limit the end date to today
+    if last_day_of_month > end_day:
+        last_day_of_month = end_day
+   
+
+
+    month_periods = get_month_periods(first_day_of_month, last_day_of_month)
     # Get the ordinal numbers of the days of the month for deadlines
     numbers_due_dates = get_numbers_of_due_dates(habit.due_dates, period='month')
 
@@ -33,7 +56,7 @@ def get_monthly_habit_progress(user_id, habit_id, start_day, end_day):
     all_progress = HabitProgress.objects.filter(
         user_id=user_id,
         habit_id=habit_id,
-        update_time__range=[start_day, end_day]
+        update_time__range=[first_day_of_month, last_day_of_month]
     ).values('update_time').annotate(max_value=Max('current_value'))
 
     progress_by_month = defaultdict(list)
