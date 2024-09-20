@@ -118,6 +118,7 @@ class HabitGroup(models.Model):
         verbose_name="Цвет группы"
     )
     product_id = models.CharField(max_length=100, verbose_name="product id", default="_")
+    paid = models.BooleanField(verbose_name="Платная группа", default=False)
 
 
     def __str__(self):
