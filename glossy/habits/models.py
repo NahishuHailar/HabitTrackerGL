@@ -1,7 +1,8 @@
+from tabnanny import check
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from users.models import User
-from habits.services.constants import PROGRESSSTATUS, REPEATPERIOD, TRACKTIME, COLOR
+from habits.services.constants import PROGRESSSTATUS, REPEATPERIOD, TRACKTIME, COLOR, HABITTYPE
 from api.v1.services.manager import ActiveHabitManager
 
 
@@ -20,6 +21,9 @@ class Habit(models.Model):
         default=None,
         verbose_name="Habit group",
     )
+    habit_type = models.CharField(
+        max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
+    )  
     name = models.CharField(max_length=50, verbose_name="Habit name", blank=True, null=True)
     goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
     current_value = models.SmallIntegerField(verbose_name="Current value", blank=True, null=True)
@@ -55,9 +59,24 @@ class Habit(models.Model):
         return self.name
 
 
+class RoutineTask(models.Model):
+    """
+    Task for routine type habit.
+    """
+    habit = models.ForeignKey(
+        "Habit",
+        on_delete=models.CASCADE,
+        related_name="routine_tasks",
+        verbose_name="Habit",
+    )
+    name = models.CharField(max_length=100, verbose_name="Task name")
+
+    def __str__(self):
+        return f"{self.habit.name} - {self.name}"
+
 class HabitProgress(models.Model):
     """
-    habit progress history
+    Habit progress history
     """
 
     habit = models.ForeignKey(

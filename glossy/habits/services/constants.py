@@ -30,3 +30,8 @@ TRACKTIME = (
     ("afternoon", "afternoon"),
     ("evening", "evening"),
 )
+
+HABITTYPE = (
+    ("regular", "regular"),
+    ("routine", "routine"),
+)

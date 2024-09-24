@@ -67,10 +67,12 @@ class HabitListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        if local_time := self.request.META.get('HTTP_LOCAL_TIME', None):   
-            reset_habits_counters(self.kwargs["user_id"], local_time)    
+        if local_time := self.request.META.get('HTTP_LOCAL_TIME', None):
+            reset_habits_counters(self.kwargs["user_id"], local_time)
         return Habit.active.filter(user=self.kwargs["user_id"])
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """

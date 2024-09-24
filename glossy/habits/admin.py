@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 
-from .models import HabitGroup, Habit, HabitHistory, HabitProgress, Icon
+from .models import HabitGroup, Habit, HabitHistory, HabitProgress, Icon, RoutineTask
 
 
 @admin.register(Habit)
@@ -11,6 +11,7 @@ class HabitAdmin(admin.ModelAdmin):
         "user",
         "name",
         "goal",
+        "habit_type",
         "current_value",
         "habit_group",
         "status",
@@ -24,6 +25,7 @@ class HabitAdmin(admin.ModelAdmin):
         "user",
         "name",
         "goal",
+        "habit_type",
         "current_value",
         "habit_group",
         "status",
@@ -34,6 +36,12 @@ class HabitAdmin(admin.ModelAdmin):
         "start_day",
         "update_time",
     )
+
+
+@admin.register(RoutineTask)
+class RoutineTaskAdmin(admin.ModelAdmin):
+    fields = ["habit", "name"]
+    list_display = ("id", "habit", "name")
 
 
 @admin.register(HabitGroup)
