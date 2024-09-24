@@ -54,7 +54,11 @@ class Habit(models.Model):
     objects = models.Manager()  # The default manager
     active = ActiveHabitManager()  # Manager for only active habits
 
-
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(fields=['user', 'name'], name='unique_user_habit_name')
+    #     ]
+    
     def __str__(self):
         return self.name
 
@@ -70,6 +74,12 @@ class RoutineTask(models.Model):
         verbose_name="Habit",
     )
     name = models.CharField(max_length=100, verbose_name="Task name")
+    is_done = models.BooleanField(default=False, verbose_name="Is Done")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['habit', 'name'], name='unique_habit_task_name')
+        ]
 
     def __str__(self):
         return f"{self.habit.name} - {self.name}"
@@ -98,7 +108,7 @@ class HabitProgress(models.Model):
     update_time = models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.user.username + self.habit.name
+        return self.user.username or "User name is'nt set" + self.habit.name
 
 
 class HabitHistory(models.Model):

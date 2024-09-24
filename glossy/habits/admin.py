@@ -40,8 +40,8 @@ class HabitAdmin(admin.ModelAdmin):
 
 @admin.register(RoutineTask)
 class RoutineTaskAdmin(admin.ModelAdmin):
-    fields = ["habit", "name"]
-    list_display = ("id", "habit", "name")
+    fields = ["habit", "name", 'is_done']
+    list_display = ("id", "habit", "name", 'is_done')
 
 
 @admin.register(HabitGroup)
@@ -53,7 +53,7 @@ class HabitGroupAdmin(admin.ModelAdmin):
 @admin.register(HabitProgress)
 class HabitProgressAdmin(admin.ModelAdmin):
     fields = ["user", "habit", "current_value"]
-    list_display = ("id", "habit", "current_value", "update_time")
+    list_display = ("id", "habit", "current_value", "current_goal", "update_time")
 
 
 @admin.register(HabitHistory)

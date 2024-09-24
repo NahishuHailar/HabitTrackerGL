@@ -22,6 +22,7 @@ from api.v1.services.habit_counters import reset_habits_counters
 from api.v1.services.calendars.get_calendar import (
     get_progress_calendar, get_common_progress_calendar
 )
+from api.v1.services.update_habit_progress.routine_progress import check_input_progrees 
 
 logger = logging.getLogger(__name__)
 
@@ -96,11 +97,16 @@ class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
         When changing the current value of a habit, we create an entry in HabitProgress
         """
         # Getting the current habit
-        habit = self.get_object()    
-        # Checking if the current_value has changed
+        habit = self.get_object() 
+        # Creating a new progress record for routine
+        if habit.habit_type == 'routine':
+            print(f'input progress == {check_input_progrees(habit, request)}')
+
+
+        # Checking if the current_value has changed for regular habit
         new_current_value = request.data.get("current_value")
         if new_current_value and habit.current_value != int(new_current_value):
-        # Creating a new progress record
+        # Creating a new progress record for regular habit
             HabitProgress.objects.create(
                 habit=habit,
                 user_id=self.kwargs["user_id"],

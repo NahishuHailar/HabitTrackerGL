@@ -34,9 +34,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class HabitSerializer(serializers.ModelSerializer):
-    routine_tasks = serializers.ListSerializer(
-        child=serializers.CharField(), required=False, allow_empty=True
-    )
+    # routine_tasks = serializers.ListField(
+    #     child=serializers.DictField(child=serializers.BooleanField()), required=False
+    # )
 
     class Meta:
         model = Habit
@@ -52,7 +52,7 @@ class HabitSerializer(serializers.ModelSerializer):
         # Отображение задач рутины для привычки типа "routine"
         if instance.habit_type == "routine":
             rep["routine_tasks"] = [
-                task.name for task in instance.routine_tasks.all()
+                {task.name: task.is_done} for task in instance.routine_tasks.all()
             ]
         return rep
 
@@ -82,33 +82,71 @@ class HabitSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         routine_tasks_data = validated_data.pop("routine_tasks", None)
+        habit_type = validated_data.get("habit_type", None)
+        
+        if habit_type == "regular":
+            habit = Habit.objects.create(**validated_data)
+            return habit
+        
+        validated_data['goal'], validated_data['current_value'] = 0, 0
+        if routine_tasks_data:
+            goal, current_value = len(routine_tasks_data), 0
+            for task_data in routine_tasks_data:
+                if list(task_data.values())[0]:
+                    current_value += 1
+            validated_data['goal'], validated_data['current_value'] = goal, current_value       
+        
         habit = Habit.objects.create(**validated_data)
-
+            
         # Если это привычка типа "routine", создаем задачи
         if habit.habit_type == "routine" and routine_tasks_data:
-            for task_name in routine_tasks_data:
-                RoutineTask.objects.create(habit=habit, name=task_name)
+
+            for task_data in routine_tasks_data:
+                # task_data — это словарь, где ключ — название задачи, а значение — её статус (True/False)
+                for task_name, is_done in task_data.items():
+                    RoutineTask.objects.create(habit=habit, name=task_name, is_done=is_done)
+
 
         return habit
 
     def update(self, instance, validated_data):
         routine_tasks_data = validated_data.pop("routine_tasks", None)
-        instance = super().update(instance, validated_data)
+        if instance.habit_type == "regular":
+            instance = super().update(instance, validated_data)
+            return instance
 
+        print('hi')
+        validated_data['goal'], validated_data['current_value'] = 0, 0
+        if routine_tasks_data:
+            goal, current_value = len(routine_tasks_data), 0
+            for task_data in routine_tasks_data:
+                if list(task_data.values())[0]:
+                    current_value += 1
+            
+            request = self.context.get('request')
+            if instance.current_value < current_value and request.method == 'PATCH':
+                HabitProgress.objects.create(
+                habit=instance,
+                user_id=request.user.id,
+                current_goal=goal,
+                current_value=current_value
+            )   
+
+            validated_data['goal'], validated_data['current_value'] = goal, current_value
         # Обновляем задачи рутины, если это привычка типа "routine"
-        if instance.habit_type == "routine":
-            instance.routine_tasks.all().delete()  # Удаляем старые задачи
-            if routine_tasks_data:
-                for task_name in routine_tasks_data:
-                    RoutineTask.objects.create(habit=instance, name=task_name)
-
+        instance.routine_tasks.all().delete()  # Удаляем старые задачи
+        if routine_tasks_data:
+            for task_data in routine_tasks_data:
+                for task_name, is_done in task_data.items():
+                    RoutineTask.objects.create(habit=instance, name=task_name, is_done=is_done)
+        instance = super().update(instance, validated_data)
         return instance
     
 
 class RoutineTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoutineTask
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'is_done']
 
 
 class HabitDatesSerializer(serializers.ModelSerializer):
