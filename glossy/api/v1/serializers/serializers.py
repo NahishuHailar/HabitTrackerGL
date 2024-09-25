@@ -81,13 +81,13 @@ class HabitSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
-        routine_tasks_data = validated_data.pop("routine_tasks", None)
-        habit_type = validated_data.get("habit_type", None)
-        
-        if habit_type == "regular":
+        if "routine_tasks" not in validated_data.keys():
             habit = Habit.objects.create(**validated_data)
             return habit
+
+        routine_tasks_data = validated_data.pop("routine_tasks", None)
         
+        validated_data['habit_type'], validated_data['repeat_period'] = "routine", "day"
         validated_data['goal'], validated_data['current_value'] = 0, 0
         if routine_tasks_data:
             goal, current_value = len(routine_tasks_data), 0
@@ -99,7 +99,7 @@ class HabitSerializer(serializers.ModelSerializer):
         habit = Habit.objects.create(**validated_data)
             
         # Если это привычка типа "routine", создаем задачи
-        if habit.habit_type == "routine" and routine_tasks_data:
+        if routine_tasks_data:
 
             for task_data in routine_tasks_data:
                 # task_data — это словарь, где ключ — название задачи, а значение — её статус (True/False)
