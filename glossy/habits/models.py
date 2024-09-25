@@ -76,10 +76,10 @@ class RoutineTask(models.Model):
     name = models.CharField(max_length=100, verbose_name="Task name")
     is_done = models.BooleanField(default=False, verbose_name="Is Done")
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['habit', 'name'], name='unique_habit_task_name')
-        ]
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(fields=['habit', 'name'], name='unique_habit_task_name')
+    #     ]
 
     def __str__(self):
         return f"{self.habit.name} - {self.name}"
