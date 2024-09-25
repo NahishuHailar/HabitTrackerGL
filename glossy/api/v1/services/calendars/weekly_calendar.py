@@ -43,9 +43,11 @@ def get_weekly_habit_progress(user_id, habit_id, start_day, end_day, pagination=
         last_day_of_month = end_day
    
     # Creating a list of weeks for the reporting period
+    # Like [(start_week_1, end_week_1), (start_week_2, end_week_2) ...]
     week_periods = get_week_periods(first_day_of_month, last_day_of_month)
 
     # Get the ordinal numbers of the days of the week for deadlines
+    # Like  (0, 2, 4) == (Monday, Wednesday, Friday) 
     numbers_due_dates = get_numbers_of_due_dates(habit.due_dates, period='week')
  
     result = defaultdict(str)
@@ -101,7 +103,11 @@ def get_week_periods(start_day, end_day):
     current_start = start_day - timedelta(days=start_day.weekday())
     current_end = current_start + timedelta(days=6)
 
-    while current_end <= end_day:
+    # Only for habit.repeat_period =="week" :
+    # added week period afteer current week (for new deadlines)
+    # by end_day + timedelta(days=7)
+    end_day = end_day + timedelta(days=7)
+    while current_end <= end_day: 
         weeks.append((current_start, current_end))
         current_start += timedelta(days=7)
         current_end += timedelta(days=7)
