@@ -12,6 +12,7 @@ from .weekly_calendar import  get_weekly_habit_progress
 from .mothly_calendar import get_monthly_habit_progress
 from .annual_calendar import get_yearly_habit_progress
 from .always_calendar import get_always_habit_progress
+from .pagination_status import chek_pagination
 
 def get_progress_calendar(user_id, habit_id, pagination):
     """
@@ -32,10 +33,11 @@ def get_progress_calendar(user_id, habit_id, pagination):
     elif habit.repeat_period == 'always':
         return get_always_habit_progress(user_id, habit_id, start_day, end_day, pagination)
     else:
-        return []
+        last_page, out_of_range = True, True
+        return {}, last_page, out_of_range
 
 
-def get_common_progress_calendar(user_id, pagination=0):
+def get_common_progress_calendar(user_id, pagination):
     """
     Overall result for each habit for each day.
     For every day: habits: ['green', 'green', 'green'] --> green (all - green)
@@ -50,6 +52,8 @@ def get_common_progress_calendar(user_id, pagination=0):
     for habit in habit_list:
         all_calendars.append(get_progress_calendar(user_id=user_id, habit_id=habit.id, pagination=pagination))
     
+    all_calendars, last_page, out_of_range = chek_pagination(all_calendars)
+    
     combined_values = defaultdict(list)
     for habit_calendar in all_calendars:
             for date, color in habit_calendar.items():
@@ -63,7 +67,7 @@ def get_common_progress_calendar(user_id, pagination=0):
         else:
             common_calendar[date] = 'yellow'
            
-    return dict(sorted(common_calendar.items()))
+    return dict(sorted(common_calendar.items())), last_page, out_of_range
 
 
 

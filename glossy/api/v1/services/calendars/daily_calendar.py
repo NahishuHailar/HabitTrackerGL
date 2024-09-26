@@ -11,7 +11,7 @@ from habits.models import HabitProgress
 from .month_range import get_month_range
 
 
-def get_daily_habit_progress(user_id, habit_id, start_day, end_day, pagination=1):
+def get_daily_habit_progress(user_id, habit_id, start_day, end_day, pagination):
     """
     The habit is fully fulfilled - green (number of executions >= daily goal).
     The habit is partially fulfilled - yellow  (0 <number of executions < daily goal)
@@ -19,7 +19,11 @@ def get_daily_habit_progress(user_id, habit_id, start_day, end_day, pagination=1
 
     """
     # Determine the date of the first and last day of the month based on pagination
-    first_day_of_month, last_day_of_month = get_month_range(end_day, pagination)
+    first_day_of_month, last_day_of_month, last_page, out_of_range = get_month_range(end_day, pagination, start_day)
+
+    if out_of_range:
+        return {}, last_page, out_of_range    
+    
 
     # If the month specified in the pagination coincides with the month of the habit start,
     # check that the start date is not earlier than the start of the habit
@@ -55,4 +59,4 @@ def get_daily_habit_progress(user_id, habit_id, start_day, end_day, pagination=1
             progress_dict[date_str] = "yellow"
 
     result = dict(sorted(progress_dict.items()))
-    return result
+    return result, last_page, out_of_range

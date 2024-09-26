@@ -207,11 +207,12 @@ class HabitProgressAPIView(APIView):
 
     def get(self, request, user_id, habit_id):
         pagination = int(request.query_params.get('pagination', 0)) 
-        progress_calendar = get_progress_calendar(
+        progress_calendar, last_page, out_of_range = get_progress_calendar(
             user_id=user_id, 
             habit_id=habit_id, 
             pagination=pagination
         )
+        progress_calendar['last_page'], progress_calendar['out_of_range'] = last_page, out_of_range
         return Response(progress_calendar)
 
 
@@ -224,5 +225,7 @@ class CommonHabitProgressAPIView(APIView):
 
     def get(self, request, user_id):
         pagination = int(request.query_params.get('pagination', 0)) 
-        common_progress_calendar = get_common_progress_calendar(user_id=user_id, pagination=pagination)
+        common_progress_calendar, last_page, out_of_range = get_common_progress_calendar(user_id=user_id, pagination=pagination)
+        common_progress_calendar['last_page'] = last_page
+        common_progress_calendar['out_of_range'] = out_of_range
         return Response(common_progress_calendar)

@@ -15,7 +15,7 @@ from .month_range import get_month_range
 
 
 
-def get_monthly_habit_progress(user_id, habit_id, start_day, end_day, pagination=0):
+def get_monthly_habit_progress(user_id, habit_id, start_day, end_day, pagination):
     """
     We work separately with each reporting month of a given period.
     For each week :
@@ -29,7 +29,11 @@ def get_monthly_habit_progress(user_id, habit_id, start_day, end_day, pagination
 
     # Creating a list of months for the reporting period
      # Determine the date of the first and last day of the month based on pagination
-    first_day_of_month, last_day_of_month = get_month_range(end_day, pagination)
+    first_day_of_month, last_day_of_month, last_page, out_of_range = get_month_range(end_day, pagination, start_day)
+
+    if out_of_range:
+        return {}, last_page, out_of_range    
+    
 
     # If the month specified in the pagination coincides with the month of the habit start,
     # check that the start date is not earlier than the start of the habit
@@ -91,7 +95,7 @@ def get_monthly_habit_progress(user_id, habit_id, start_day, end_day, pagination
         datetime.strftime(key, '%Y-%m-%d'): value 
         for key, value in sorted(result.items()) if key >= start_day
         }
-    return result
+    return result, last_page, out_of_range
 
 
 def get_month_periods(start_day, end_day):

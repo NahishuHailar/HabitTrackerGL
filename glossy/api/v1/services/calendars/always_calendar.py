@@ -12,12 +12,15 @@ from .month_range import get_month_range
 
 
 
-def get_always_habit_progress(user_id, habit_id, start_day, end_day, pagination=0):
+def get_always_habit_progress(user_id, habit_id, start_day, end_day, pagination):
     """
     Every day of the trekking habit is marked with a green dot on the calendar.
     """
     # Determine the date of the first and last day of the month based on pagination
-    first_day_of_month, last_day_of_month = get_month_range(end_day, pagination)
+    first_day_of_month, last_day_of_month, last_page, out_of_range = get_month_range(end_day, pagination, start_day)
+
+    if out_of_range:
+        return {}, last_page, out_of_range    
     
     #If the month specified in the pagination coincides with the month of the habit start,
     # check that the start date is not earlier than the start of the habit
@@ -38,4 +41,4 @@ def get_always_habit_progress(user_id, habit_id, start_day, end_day, pagination=
     ).values('update_time').annotate(max_value=Max('current_value'))
  
     result = {record['update_time'].strftime('%Y-%m-%d'): "green" for record in progress_records}
-    return result
+    return result, last_page, out_of_range
