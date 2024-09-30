@@ -10,6 +10,7 @@ class HabitAdmin(admin.ModelAdmin):
     fields = [
         "user",
         "name",
+        "description",
         "goal",
         "habit_type",
         "current_value",
@@ -24,6 +25,7 @@ class HabitAdmin(admin.ModelAdmin):
         "id",
         "user",
         "name",
+        "description",
         "goal",
         "habit_type",
         "current_value",

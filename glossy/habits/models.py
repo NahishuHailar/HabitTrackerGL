@@ -25,6 +25,7 @@ class Habit(models.Model):
         max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
     )  
     name = models.CharField(max_length=50, verbose_name="Habit name", blank=True, null=True)
+    description = models.TextField(verbose_name="Description", blank=True, null=True) 
     goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
     current_value = models.SmallIntegerField(verbose_name="Current value", blank=True, null=True)
     status = models.CharField(
