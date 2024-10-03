@@ -111,7 +111,8 @@ class HabitSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         routine_tasks_data = validated_data.pop("routine_tasks", None)
-        if instance.habit_type == "regular":
+        habit_type = validated_data.get("habit_type", None)
+        if habit_type and habit_type == "regular":
             instance = super().update(instance, validated_data)
             return instance
 
@@ -123,7 +124,9 @@ class HabitSerializer(serializers.ModelSerializer):
                     current_value += 1
             
             request = self.context.get('request')
-            if instance.current_value < current_value and request.method == 'PATCH':
+            if instance.current_value is None:
+                instance.current_value = 0
+            if int(instance.current_value) < current_value and request.method == 'PATCH':
                 HabitProgress.objects.create(
                 habit=instance,
                 user_id=request.user.id,
