@@ -115,7 +115,6 @@ class HabitSerializer(serializers.ModelSerializer):
             instance = super().update(instance, validated_data)
             return instance
 
-        print('hi')
         validated_data['goal'], validated_data['current_value'] = 0, 0
         if routine_tasks_data:
             goal, current_value = len(routine_tasks_data), 0
@@ -138,8 +137,9 @@ class HabitSerializer(serializers.ModelSerializer):
         if routine_tasks_data:
             for task_data in routine_tasks_data:
                 for task_name, is_done in task_data.items():
-                    RoutineTask.objects.create(habit=instance, name=task_name, is_done=is_done)
+                    RoutineTask.objects.create(habit=instance, name=task_name, is_done=is_done)            
         instance = super().update(instance, validated_data)
+        validated_data["routine_tasks"] = routine_tasks_data
         return instance
     
 

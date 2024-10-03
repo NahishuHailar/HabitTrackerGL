@@ -9,10 +9,13 @@ from api.v1.views.views import (GetUserAPIView,
     CurrentHabitDatesListAPIView,
     HabitGroupListAPIView,
     AvatarListAPIView,
-    HabitProgressAPIView,
-    CommonHabitProgressAPIView,
+    HabitProgressPagAPIView,
+    CommonHabitProgressPagAPIView,
     IconListListAPIView,
     AvatarGroupListAPIView,
+    HabitProgressAPIView,
+    CommonHabitProgressAPIView
+
 )
 
 urlpatterns = [
@@ -33,6 +36,8 @@ urlpatterns = [
     path("api/v1/avatar/", AvatarListAPIView.as_view(), name='avatar_list'),
     path("api/v1/avatargroup/", AvatarGroupListAPIView.as_view(), name='avatargroup_list'),
     path("api/v1/icons/", IconListListAPIView.as_view(), name='icon_list'),
+    path("api/v1/progresspag/<uuid:user_id>/<int:habit_id>/", HabitProgressPagAPIView.as_view(), name='habit_progress'),
+    path("api/v1/commonprogresspag/<uuid:user_id>/", CommonHabitProgressPagAPIView.as_view(), name='common_habit_progress'),
     path("api/v1/progress/<uuid:user_id>/<int:habit_id>/", HabitProgressAPIView.as_view(), name='habit_progress'),
     path("api/v1/commonprogress/<uuid:user_id>/", CommonHabitProgressAPIView.as_view(), name='common_habit_progress'),
 ]

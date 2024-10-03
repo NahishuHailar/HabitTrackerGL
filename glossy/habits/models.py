@@ -61,7 +61,7 @@ class Habit(models.Model):
     #     ]
     
     def __str__(self):
-        return self.name
+        return self.name or "Habit Name isn't set"
 
 
 class RoutineTask(models.Model):

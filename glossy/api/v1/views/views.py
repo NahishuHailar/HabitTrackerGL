@@ -20,9 +20,14 @@ from api.v1.serializers.serializers import (
 from users.auth.user_cred import get_user_cred
 from api.v1.services.habit_counters import reset_habits_counters
 from api.v1.services.calendars.get_calendar import (
-    get_progress_calendar, get_common_progress_calendar
+    get_progress_calendar,
+    get_common_progress_calendar,
 )
-from api.v1.services.update_habit_progress.routine_progress import check_input_progrees 
+from api.v1.services.old_calendars.get_old_calendar import (
+    get_old_common_progress_calendar,
+    get_old_progress_calendar,
+)
+from api.v1.services.update_habit_progress.routine_progress import check_input_progrees
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +59,7 @@ class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        self.kwargs['pk'] = self.kwargs['user_id']
+        self.kwargs["pk"] = self.kwargs["user_id"]
         query_set = User.objects.filter(pk=self.kwargs["pk"])
         return query_set
 
@@ -68,12 +73,13 @@ class HabitListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        if local_time := self.request.META.get('HTTP_LOCAL_TIME', None):
+        if local_time := self.request.META.get("HTTP_LOCAL_TIME", None):
             reset_habits_counters(self.kwargs["user_id"], local_time)
         return Habit.active.filter(user=self.kwargs["user_id"])
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
 
 class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -84,24 +90,19 @@ class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        #Setting the pk for the current object
+        # Setting the pk for the current object
         self.kwargs["pk"] = self.kwargs["habit_id"]
-        query_set = (
-            Habit.objects.filter(pk=self.kwargs["habit_id"], user_id=self.kwargs["user_id"])
-            .select_related("habit_group")
-        )
+        query_set = Habit.objects.filter(
+            pk=self.kwargs["habit_id"], user_id=self.kwargs["user_id"]
+        ).select_related("habit_group")
         return query_set
-    
+
     def patch(self, request, *args, **kwargs):
         """
         When changing the current value of a habit, we create an entry in HabitProgress
         """
         # Getting the current habit
-        habit = self.get_object() 
-        # Creating a new progress record for routine
-        if habit.habit_type == 'routine':
-            print(f'input progress == {check_input_progrees(habit, request)}')
-
+        habit = self.get_object()
 
         # Checking if the current_value has changed for regular habit
         new_current_value = request.data.get("current_value")
@@ -112,19 +113,18 @@ class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
                 user_id=self.kwargs["user_id"],
                 current_goal=habit.goal,
                 current_due_dates=habit.due_dates,
-                current_value=new_current_value
-            )         
+                current_value=new_current_value,
+            )
         return super().patch(request, *args, **kwargs)
 
-    
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         # Changing the status to "deleted" instead of deleting
         instance.status = "deleted"
         instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    
+
+
 class HabitDatesListAPIView(generics.ListAPIView):
     """
     Read all current user habit progress updates
@@ -134,9 +134,9 @@ class HabitDatesListAPIView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return HabitProgress.objects.filter(
-            user_id=self.kwargs["user_id"]
-        ).order_by("habit")
+        return HabitProgress.objects.filter(user_id=self.kwargs["user_id"]).order_by(
+            "habit"
+        )
 
 
 class CurrentHabitDatesListAPIView(generics.ListAPIView):
@@ -152,9 +152,9 @@ class CurrentHabitDatesListAPIView(generics.ListAPIView):
         return HabitProgress.objects.filter(
             user_id=self.kwargs["user_id"], habit_id=self.kwargs["habit_id"]
         )
-        
 
-@method_decorator(cache_page(30), name='dispatch')
+
+@method_decorator(cache_page(30), name="dispatch")
 class HabitGroupListAPIView(generics.ListAPIView):
     """
     Read all habit groups
@@ -165,7 +165,7 @@ class HabitGroupListAPIView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-@method_decorator(cache_page(30), name='dispatch')
+@method_decorator(cache_page(30), name="dispatch")
 class AvatarListAPIView(generics.ListAPIView):
     """
     Get list avatars urls
@@ -176,7 +176,7 @@ class AvatarListAPIView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-@method_decorator(cache_page(30), name='dispatch')
+@method_decorator(cache_page(30), name="dispatch")
 class IconListListAPIView(generics.ListAPIView):
     """
     Get list of icons.
@@ -187,7 +187,7 @@ class IconListListAPIView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-@method_decorator(cache_page(30), name='dispatch')
+@method_decorator(cache_page(30), name="dispatch")
 class AvatarGroupListAPIView(generics.ListAPIView):
     """
     Read all habit groups
@@ -198,21 +198,56 @@ class AvatarGroupListAPIView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
 
+class HabitProgressPagAPIView(APIView):
+    """
+    Get progress list of current habit. For a current habit calendar.
+    """
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, user_id, habit_id):
+        pagination = int(request.query_params.get("pagination", 0))
+        progress_calendar, last_page, out_of_range = get_progress_calendar(
+            user_id=user_id, habit_id=habit_id, pagination=pagination
+        )
+        result = {}
+        result['pagination'] = {'last_page': last_page, 'out_of_range': out_of_range}
+        result['data'] = progress_calendar
+        return Response(result)
+
+
+
+class CommonHabitProgressPagAPIView(APIView):
+    """
+    Get common progress list. Overall result of habit execution.
+    """
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, user_id):
+        pagination = int(request.query_params.get("pagination", 0))
+        common_progress_calendar, last_page, out_of_range = (
+            get_common_progress_calendar(user_id=user_id, pagination=pagination)
+        )
+       
+        result = {}
+        result['pagination'] = {'last_page': last_page, 'out_of_range': out_of_range}
+        result['data'] = common_progress_calendar
+        return Response(result)
+
 
 class HabitProgressAPIView(APIView):
     """
     Get progress list of current habit. For a current habit calendar.
     """
+
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, user_id, habit_id):
-        pagination = int(request.query_params.get('pagination', 0)) 
-        progress_calendar, last_page, out_of_range = get_progress_calendar(
-            user_id=user_id, 
-            habit_id=habit_id, 
-            pagination=pagination
+        progress_calendar = get_old_progress_calendar(
+            user_id=user_id,
+            habit_id=habit_id,
         )
-        progress_calendar['last_page'], progress_calendar['out_of_range'] = last_page, out_of_range
         return Response(progress_calendar)
 
 
@@ -224,8 +259,5 @@ class CommonHabitProgressAPIView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, user_id):
-        pagination = int(request.query_params.get('pagination', 0)) 
-        common_progress_calendar, last_page, out_of_range = get_common_progress_calendar(user_id=user_id, pagination=pagination)
-        common_progress_calendar['last_page'] = last_page
-        common_progress_calendar['out_of_range'] = out_of_range
+        common_progress_calendar = get_old_common_progress_calendar(user_id=user_id)
         return Response(common_progress_calendar)
