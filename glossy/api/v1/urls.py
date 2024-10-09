@@ -14,7 +14,8 @@ from api.v1.views.views import (GetUserAPIView,
     IconListListAPIView,
     AvatarGroupListAPIView,
     HabitProgressAPIView,
-    CommonHabitProgressAPIView
+    CommonHabitProgressAPIView,
+    HabitTemplateViewSet
 
 )
 
@@ -40,4 +41,7 @@ urlpatterns = [
     path("api/v1/commonprogresspag/<uuid:user_id>/", CommonHabitProgressPagAPIView.as_view(), name='common_habit_progress'),
     path("api/v1/progress/<uuid:user_id>/<int:habit_id>/", HabitProgressAPIView.as_view(), name='habit_progress'),
     path("api/v1/commonprogress/<uuid:user_id>/", CommonHabitProgressAPIView.as_view(), name='common_habit_progress'),
+    path('api/v1/create-habit-from-template/', HabitTemplateViewSet.as_view({
+        'post': 'create_habit_from_template'
+    })),
 ]

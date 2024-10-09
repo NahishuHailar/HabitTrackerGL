@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from users.models import User, UserAvatar, AvatarGroup
 from habits.models import Habit, HabitGroup, HabitProgress, Icon, RoutineTask
+from habits.services.creating_habit import create_habit_from_template
 
 
 class GetUserSerializer(serializers.ModelSerializer):
@@ -191,3 +192,17 @@ class IconSerializer(serializers.ModelSerializer):
         rep = super(IconSerializer, self).to_representation(instance)
         rep["habit_group"] = instance.habit_group.name
         return rep
+
+
+class CreateHabitFromTemplateSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    template_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        # Вызываем сервис для создания привычки
+        new_habit = create_habit_from_template(
+            user_id=validated_data['user_id'], 
+            template_id=validated_data['template_id']
+        )
+        return new_habit
+    

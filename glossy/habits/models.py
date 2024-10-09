@@ -84,6 +84,47 @@ class RoutineTask(models.Model):
 
     def __str__(self):
         return f"{self.habit.name} - {self.name}"
+    
+
+
+class HabitTemplate(models.Model):
+    """
+    Template for pre-defined habits.
+    """
+    name = models.CharField(max_length=50, verbose_name="Habit name")
+    description = models.TextField(verbose_name="Description", blank=True, null=True)
+    goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
+    habit_group = models.ForeignKey(
+        "HabitGroup",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="Habit group",
+    )
+    habit_type = models.CharField(
+        max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
+    )
+    repeat_period = models.CharField(
+        max_length=20, choices=REPEATPERIOD, verbose_name="Repeat period", default="always"
+    )
+    icon = models.CharField(max_length=20, verbose_name="Icon", blank=True, null=True)
+    track_time = models.CharField(
+        max_length=20,
+        choices=TRACKTIME,
+        verbose_name="Track time",
+        default="all_day",
+    )
+    due_dates = ArrayField(
+        models.CharField(),
+        null=True,
+        blank=True,
+        verbose_name="Due dates", 
+    )
+    
+    def __str__(self):
+        return self.name
+        
 
 class HabitProgress(models.Model):
     """

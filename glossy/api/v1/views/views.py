@@ -1,5 +1,5 @@
 import logging
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -16,6 +16,7 @@ from api.v1.serializers.serializers import (
     AvatarSerializer,
     IconSerializer,
     AvatarGroupSerializer,
+    CreateHabitFromTemplateSerializer
 )
 from users.auth.user_cred import get_user_cred
 from api.v1.services.habit_counters import reset_habits_counters
@@ -261,3 +262,23 @@ class CommonHabitProgressAPIView(APIView):
     def get(self, request, user_id):
         common_progress_calendar = get_old_common_progress_calendar(user_id=user_id)
         return Response(common_progress_calendar)
+
+
+
+class HabitTemplateViewSet(viewsets.ViewSet):
+    
+    def create_habit_from_template(self, request):
+        """
+        Создать привычку на основе шаблона.
+        """
+        serializer = CreateHabitFromTemplateSerializer(data=request.data)
+        if serializer.is_valid():
+            new_habit = serializer.save()
+            return Response({
+                'habit_id': new_habit.id,
+                'habit_name': new_habit.name,
+              #  'habit_group': new_habit.habit_group,
+                'description': new_habit.description,
+                'goal': new_habit.goal,
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
