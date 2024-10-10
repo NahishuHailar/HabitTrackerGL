@@ -16,6 +16,7 @@ def create_habit_from_template(user_id, template_id):
         name=habit_template.name,
         description=habit_template.description,
       #  habit_group=habit_template.habit_group,
+        made_from = habit_template.id,
         goal=habit_template.goal,
         habit_type=habit_template.habit_type,
         repeat_period=habit_template.repeat_period,

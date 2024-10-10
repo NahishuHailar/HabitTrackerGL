@@ -1,3 +1,4 @@
+from enum import unique
 from tabnanny import check
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
@@ -25,6 +26,14 @@ class Habit(models.Model):
         max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
     )  
     name = models.CharField(max_length=50, verbose_name="Habit name", blank=True, null=True)
+    made_from = models.ForeignKey(
+        "HabitTemplate",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="Parrent template",
+    )
     description = models.TextField(verbose_name="Description", blank=True, null=True) 
     goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
     current_value = models.SmallIntegerField(verbose_name="Current value", blank=True, null=True)
@@ -91,7 +100,7 @@ class HabitTemplate(models.Model):
     """
     Template for pre-defined habits.
     """
-    name = models.CharField(max_length=50, verbose_name="Habit name")
+    name = models.CharField(max_length=50, verbose_name="Habit name", unique=True)
     description = models.TextField(verbose_name="Description", blank=True, null=True)
     goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
     habit_group = models.ForeignKey(
