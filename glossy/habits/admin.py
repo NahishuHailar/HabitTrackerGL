@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 
-from .models import HabitGroup, Habit, HabitHistory, HabitProgress, Icon, RoutineTask, HabitTemplate
+from .models import HabitGroup, Habit, HabitHistory, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres, TemplateBundles, TemplateBundleItem
 
 
 @admin.register(Habit)
@@ -52,6 +52,21 @@ class HabitTemplateAdmin(admin.ModelAdmin):
     fields = ["name", "description", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates"]
     list_display = ("id", "name", "description", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates")
 
+@admin.register(LifeSpheres)
+class LifeSpheresAdmin(admin.ModelAdmin):
+    fields = ["name","habit_group"]
+    list_display = ("id", "name", "habit_group")
+
+@admin.register(TemplateBundles)
+class TemplateBundlesAdmin(admin.ModelAdmin):
+    fields = ["name","description", "life_spheres", "parent_bundle"]
+    list_display = ("id", "name","description", "life_spheres", "parent_bundle")
+
+
+@admin.register(TemplateBundleItem)
+class TemplateBundleItemAdmin(admin.ModelAdmin):
+    fields = ["template_bundle", "habit_template", "included_bundle"]
+    list_display = ("id", "template_bundle", "habit_template", "included_bundle")
 
 
 @admin.register(HabitGroup)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.models import User, UserAvatar, AvatarGroup
-from habits.models import Habit, HabitGroup, HabitProgress, Icon, RoutineTask
+from habits.models import Habit, HabitGroup, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres
 from habits.services.creating_habit import create_habit_from_template
 
 
@@ -193,7 +193,6 @@ class IconSerializer(serializers.ModelSerializer):
         rep["habit_group"] = instance.habit_group.name
         return rep
 
-
 class CreateHabitFromTemplateSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
     template_id = serializers.IntegerField()
@@ -206,3 +205,95 @@ class CreateHabitFromTemplateSerializer(serializers.Serializer):
         )
         return new_habit
     
+
+class HabitTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HabitTemplate
+        fields = '__all__'    
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        
+        # Отображение группы привычек по имени
+        if instance.habit_group:
+            rep["habit_group"] = instance.habit_group.name
+        
+        # Отображение задач рутины для привычки типа "routine"
+        if instance.habit_type == "routine":
+            rep["routine_tasks"] = [
+                {task.name: task.is_done} for task in instance.routine_tasks.all()
+            ]
+        return rep
+
+    def to_internal_value(self, data):
+        data_copy = data.copy()
+
+        # Обработка habit_group по имени
+        habit_group_value = data_copy.get("habit_group")
+        if habit_group_value:
+            try:
+            # Если значение — это UUID (ID группы), используем его напрямую
+                if isinstance(habit_group_value, (int, str)):
+                    if HabitGroup.objects.filter(id=habit_group_value).exists():
+                        data_copy["habit_group"] = habit_group_value
+                    else:
+                        # Если это не ID, попробуем найти по имени
+                        habit_group = HabitGroup.objects.get(name=habit_group_value)
+                        data_copy["habit_group"] = habit_group.id
+                else:
+                    raise serializers.ValidationError("Invalid habit group format.")
+            except HabitGroup.DoesNotExist:
+                raise serializers.ValidationError("Habit group does not exist.")
+            
+        # Обработка задач для рутины
+        routine_tasks_data = data_copy.pop("routine_tasks", None)
+        
+        # Преобразование и проверка данных с помощью родительского метода
+        validated_data = super().to_internal_value(data_copy)
+
+        # Добавление задач рутины, если они присутствуют
+        if routine_tasks_data:
+            validated_data["routine_tasks"] = routine_tasks_data
+
+        return validated_data
+    
+
+class LifeSpheresSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LifeSpheres
+        fields = '__all__'    
+        
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        
+        # Отображение группы привычек по имени
+        if instance.habit_group:
+            rep["habit_group"] = instance.habit_group.name
+        
+        return rep
+
+    def to_internal_value(self, data):
+        data_copy = data.copy()
+
+        # Обработка habit_group по имени
+        habit_group_value = data_copy.get("habit_group")
+        if habit_group_value:
+            try:
+            # Если значение — это UUID (ID группы), используем его напрямую
+                if isinstance(habit_group_value, (int, str)):
+                    if HabitGroup.objects.filter(id=habit_group_value).exists():
+                        data_copy["habit_group"] = habit_group_value
+                    else:
+                        # Если это не ID, попробуем найти по имени
+                        habit_group = HabitGroup.objects.get(name=habit_group_value)
+                        data_copy["habit_group"] = habit_group.id
+                else:
+                    raise serializers.ValidationError("Invalid habit group format.")
+            except HabitGroup.DoesNotExist:
+                raise serializers.ValidationError("Habit group does not exist.")
+            
+        # Преобразование и проверка данных с помощью родительского метода
+        validated_data = super().to_internal_value(data_copy)
+
+        return validated_data    

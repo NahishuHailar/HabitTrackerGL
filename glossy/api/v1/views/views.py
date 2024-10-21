@@ -1,13 +1,16 @@
 import logging
+
 from rest_framework import generics, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
 from users.models import User, UserAvatar, AvatarGroup
-from habits.models import Habit, HabitProgress, HabitGroup, Icon
+from habits.models import Habit, HabitProgress, HabitGroup, Icon, HabitTemplate, LifeSpheres
 from api.v1.serializers.serializers import (
     HabitGroupSerializer,
     UserSerializer,
@@ -16,7 +19,9 @@ from api.v1.serializers.serializers import (
     AvatarSerializer,
     IconSerializer,
     AvatarGroupSerializer,
-    CreateHabitFromTemplateSerializer
+    CreateHabitFromTemplateSerializer,
+    HabitTemplateSerializer,
+    LifeSpheresSerializer 
 )
 from users.auth.user_cred import get_user_cred
 from api.v1.services.habit_counters import reset_habits_counters
@@ -265,8 +270,14 @@ class CommonHabitProgressAPIView(APIView):
 
 
 
-class HabitTemplateViewSet(viewsets.ViewSet):
+class HabitTemplateViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet для CRUD операций с шаблонами привычек и создания привычек на основе шаблонов.
+    """    
+    queryset = HabitTemplate.objects.all()
+    serializer_class = HabitTemplateSerializer
     
+    @action(detail=False, methods=['post'], url_path='create-habit-from-template')
     def create_habit_from_template(self, request):
         """
         Создать привычку на основе шаблона.
@@ -277,8 +288,14 @@ class HabitTemplateViewSet(viewsets.ViewSet):
             return Response({
                 'habit_id': new_habit.id,
                 'habit_name': new_habit.name,
-              #  'habit_group': new_habit.habit_group,
+                'habit_group': new_habit.habit_group.name,
                 'description': new_habit.description,
                 'goal': new_habit.goal,
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class LifeSpheresViewSet(viewsets.ModelViewSet):
+    queryset = LifeSpheres.objects.all()
+    serializer_class = LifeSpheresSerializer   
+    

@@ -1,7 +1,9 @@
 from django.urls import path
 from django.views.decorators.cache import cache_page
 
-from api.v1.views.views import (GetUserAPIView,
+from rest_framework.routers import DefaultRouter
+
+from api.v1.views.views import (GetUserAPIView, LifeSpheresViewSet,
     UserRetrieveUpdateDestroyAPIView,
     HabitListCreateAPIView,
     HabitRetrieveUpdateDestroyAPIView,
@@ -41,7 +43,12 @@ urlpatterns = [
     path("api/v1/commonprogresspag/<uuid:user_id>/", CommonHabitProgressPagAPIView.as_view(), name='common_habit_progress'),
     path("api/v1/progress/<uuid:user_id>/<int:habit_id>/", HabitProgressAPIView.as_view(), name='habit_progress'),
     path("api/v1/commonprogress/<uuid:user_id>/", CommonHabitProgressAPIView.as_view(), name='common_habit_progress'),
-    path('api/v1/create-habit-from-template/', HabitTemplateViewSet.as_view({
-        'post': 'create_habit_from_template'
-    })),
+  
 ]
+
+
+router = DefaultRouter()
+router.register(r'api/v1/habit-templates', HabitTemplateViewSet, basename='habit-template')
+router.register(r'api/v1/life-spheres', LifeSpheresViewSet, basename='life-spheres')
+
+urlpatterns += router.urls

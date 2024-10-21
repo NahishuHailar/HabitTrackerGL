@@ -96,44 +96,6 @@ class RoutineTask(models.Model):
     
 
 
-class HabitTemplate(models.Model):
-    """
-    Template for pre-defined habits.
-    """
-    name = models.CharField(max_length=50, verbose_name="Habit name", unique=True)
-    description = models.TextField(verbose_name="Description", blank=True, null=True)
-    goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
-    habit_group = models.ForeignKey(
-        "HabitGroup",
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        default=None,
-        verbose_name="Habit group",
-    )
-    habit_type = models.CharField(
-        max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
-    )
-    repeat_period = models.CharField(
-        max_length=20, choices=REPEATPERIOD, verbose_name="Repeat period", default="always"
-    )
-    icon = models.CharField(max_length=20, verbose_name="Icon", blank=True, null=True)
-    track_time = models.CharField(
-        max_length=20,
-        choices=TRACKTIME,
-        verbose_name="Track time",
-        default="all_day",
-    )
-    due_dates = ArrayField(
-        models.CharField(),
-        null=True,
-        blank=True,
-        verbose_name="Due dates", 
-    )
-    
-    def __str__(self):
-        return self.name
-        
 
 class HabitProgress(models.Model):
     """
@@ -228,4 +190,126 @@ class Icon(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class HabitTemplate(models.Model):
+    """
+    Template for pre-defined habits.
+    """
+    name = models.CharField(max_length=50, verbose_name="Habit name", unique=True)
+    description = models.TextField(verbose_name="Description", blank=True, null=True)
+    habit_group = models.ForeignKey(
+        "HabitGroup",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="Habit group",
+    )
+    textIsAiGenerated = models.BooleanField(default=False, verbose_name="AI_Generated")
+    goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
+    template_bundles = models.ForeignKey(
+        "TemplateBundles",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="TemplateBundles",
+    )
+
+    habit_type = models.CharField(
+        max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
+    )
+    repeat_period = models.CharField(
+        max_length=20, choices=REPEATPERIOD, verbose_name="Repeat period", default="always"
+    )
+    icon = models.CharField(max_length=20, verbose_name="Icon", blank=True, null=True)
+    track_time = models.CharField(
+        max_length=20,
+        choices=TRACKTIME,
+        verbose_name="Track time",
+        default="all_day",
+    )
+    due_dates = ArrayField(
+        models.CharField(),
+        null=True,
+        blank=True,
+        verbose_name="Due dates", 
+    )
+    
+    def __str__(self):
+        return self.name
+        
+
+class LifeSpheres(models.Model):
+    """
+    Spheres of human life balance wheel
+    """       
+    name = models.CharField(max_length=300, verbose_name="Life_spheres_name")
+    habit_group = models.ForeignKey(
+        "HabitGroup",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="Habit group",
+    )   
+
+
+class TemplateBundles(models.Model):
+    """
+    Template bundles: a bundle can contain either habit templates or other bundles (recursive).
+
+    """
+    name = models.CharField(max_length=300, verbose_name="Template_bundles_name")
+    description = models.TextField(verbose_name="Description", blank=True, null=True)    
+    life_spheres = models.OneToOneField(LifeSpheres, on_delete=models.SET_NULL, null=True, blank=True)
+    parent_bundle = models.ForeignKey(  # Указываем на родительский набор, если он есть
+        'self',  # Связь с самой собой
+        on_delete=models.CASCADE,  # При удалении родительского набора удаляются все вложенные
+        null=True,
+        blank=True,
+        related_name="sub_bundles",  # Для удобного доступа к вложенным наборам
+        verbose_name="Parent bundle"
+    )
+
+    def __str__(self):
+        return self.name
+    
+    
+    def get_all_templates(self):
+        """
+        Рекурсивно собирает все шаблоны привычек из этого набора и всех вложенных наборов.
+        """
+        templates = list(
+            TemplateBundleItem.objects.filter(template_bundle=self, habit_template__isnull=False)
+            .values_list('habit_template', flat=True)
+        )
+
+        # Добавляем шаблоны из вложенных наборов
+        for sub_bundle in self.sub_bundles.all():
+            templates.extend(sub_bundle.get_all_templates())
+        
+        return templates
+    
+
+class TemplateBundleItem(models.Model):
+    """
+    Intermediate table to link TemplateBundles with HabitTemplates or other TemplateBundles.
+    """
+    template_bundle = models.ForeignKey(
+        TemplateBundles, on_delete=models.CASCADE, verbose_name="Template bundle"
+    )
+    habit_template = models.ForeignKey(
+        HabitTemplate, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Habit template"
+    )
+    included_bundle = models.ForeignKey(
+        TemplateBundles, on_delete=models.CASCADE, null=True, blank=True, related_name="included_in", verbose_name="Included bundle"
+    )
+
+    def __str__(self):
+        return f"Item in {self.template_bundle.name}"
+    
+
+
     
