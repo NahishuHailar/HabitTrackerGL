@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.models import User, UserAvatar, AvatarGroup
-from habits.models import Habit, HabitGroup, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres
+from habits.models import Habit, HabitGroup, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres, TemplateBundles
 from habits.services.creating_habit import create_habit_from_template
 
 
@@ -280,16 +280,16 @@ class LifeSpheresSerializer(serializers.ModelSerializer):
         habit_group_value = data_copy.get("habit_group")
         if habit_group_value:
             try:
-            # Если значение — это UUID (ID группы), используем его напрямую
-                if isinstance(habit_group_value, (int, str)):
+            # Если значение — это UUID (ID группы), используем его напрямую                
+                if habit_group_value.isdigit():
                     if HabitGroup.objects.filter(id=habit_group_value).exists():
                         data_copy["habit_group"] = habit_group_value
                     else:
-                        # Если это не ID, попробуем найти по имени
-                        habit_group = HabitGroup.objects.get(name=habit_group_value)
-                        data_copy["habit_group"] = habit_group.id
+                        raise serializers.ValidationError("Habit group does not exist.")     
                 else:
-                    raise serializers.ValidationError("Invalid habit group format.")
+                    # Если это не ID, попробуем найти по имени
+                    habit_group = HabitGroup.objects.get(name=habit_group_value)
+                    data_copy["habit_group"] = habit_group.id
             except HabitGroup.DoesNotExist:
                 raise serializers.ValidationError("Habit group does not exist.")
             
@@ -297,3 +297,62 @@ class LifeSpheresSerializer(serializers.ModelSerializer):
         validated_data = super().to_internal_value(data_copy)
 
         return validated_data    
+
+class TemplateBundlesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TemplateBundles
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        
+        # Отображение LifeSpheres по имени
+        if instance.life_spheres:
+            rep["life_spheres"] = instance.life_spheres.name
+        
+        # Отображение родительского TemplateBundles по имени
+
+        if instance.parent_bundle:
+            rep["parent_bundle"] = instance.parent_bundle.name
+            
+        return rep
+
+    def to_internal_value(self, data):
+        data_copy = data.copy()
+
+        # Обработка life_spheres по имени
+        life_spheres_value = data_copy.get("life_spheres")
+        if life_spheres_value:
+            try:
+                # Если значение — ID сферы жизни используем его напрямую
+                if life_spheres_value.isdigit():
+                    if LifeSpheres.objects.filter(id=life_spheres_value).exists():
+                        data_copy["life_spheres"] = life_spheres_value
+                        # Если это не ID, попробуем найти по имени
+                else:          
+                    life_spheres = LifeSpheres.objects.get(name=life_spheres_value)
+                    data_copy["life_spheres"] = life_spheres.id
+            except HabitGroup.DoesNotExist:
+                raise serializers.ValidationError("Life_spheres does not exist.")
+
+        # Обработка parent_bundle по имени
+        parent_bundle_value = data_copy.get("parent_bundle")
+        if parent_bundle_value:
+            try:
+            # Если значение — ID parent_bundle используем его напрямую
+                if parent_bundle_value.isdigit():
+                    if TemplateBundles.objects.filter(id=parent_bundle_value).exists():
+                        data_copy["parent_bundle"] = parent_bundle_value
+                else:
+                    # Если это не ID, попробуем найти по имени
+                    parent_bundle = TemplateBundles.objects.get(name=parent_bundle_value)
+                    data_copy["parent_bundle"] = parent_bundle.id
+               
+            except HabitGroup.DoesNotExist:
+                raise serializers.ValidationError("Parent_bundle - TemplateBundles does not exist.")
+
+
+        # Преобразование и проверка данных с помощью родительского метода
+        validated_data = super().to_internal_value(data_copy)
+
+        return validated_data        

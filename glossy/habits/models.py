@@ -254,7 +254,9 @@ class LifeSpheres(models.Model):
         default=None,
         verbose_name="Habit group",
     )   
-
+    
+    def __str__(self):
+        return self.name
 
 class TemplateBundles(models.Model):
     """
@@ -263,7 +265,7 @@ class TemplateBundles(models.Model):
     """
     name = models.CharField(max_length=300, verbose_name="Template_bundles_name")
     description = models.TextField(verbose_name="Description", blank=True, null=True)    
-    life_spheres = models.OneToOneField(LifeSpheres, on_delete=models.SET_NULL, null=True, blank=True)
+    life_spheres = models.ForeignKey(LifeSpheres, on_delete=models.SET_NULL, null=True, blank=True)
     parent_bundle = models.ForeignKey(  # Указываем на родительский набор, если он есть
         'self',  # Связь с самой собой
         on_delete=models.CASCADE,  # При удалении родительского набора удаляются все вложенные

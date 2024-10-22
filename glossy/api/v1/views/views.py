@@ -10,7 +10,7 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
 from users.models import User, UserAvatar, AvatarGroup
-from habits.models import Habit, HabitProgress, HabitGroup, Icon, HabitTemplate, LifeSpheres
+from habits.models import Habit, HabitProgress, HabitGroup, Icon, HabitTemplate, LifeSpheres, TemplateBundles
 from api.v1.serializers.serializers import (
     HabitGroupSerializer,
     UserSerializer,
@@ -21,7 +21,8 @@ from api.v1.serializers.serializers import (
     AvatarGroupSerializer,
     CreateHabitFromTemplateSerializer,
     HabitTemplateSerializer,
-    LifeSpheresSerializer 
+    LifeSpheresSerializer,
+    TemplateBundlesSerializer 
 )
 from users.auth.user_cred import get_user_cred
 from api.v1.services.habit_counters import reset_habits_counters
@@ -299,3 +300,7 @@ class LifeSpheresViewSet(viewsets.ModelViewSet):
     queryset = LifeSpheres.objects.all()
     serializer_class = LifeSpheresSerializer   
     
+
+class TemplateBundlesViewSet(viewsets.ModelViewSet):
+    queryset = TemplateBundles.objects.all()
+    serializer_class = TemplateBundlesSerializer
