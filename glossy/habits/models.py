@@ -36,7 +36,7 @@ class Habit(models.Model):
     )
     description = models.TextField(verbose_name="Description", blank=True, null=True) 
     goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
-    current_value = models.SmallIntegerField(verbose_name="Current value", blank=True, null=True)
+    current_value = models.SmallIntegerField(verbose_name="Current value", blank=True, null=True, default=0)
     status = models.CharField(
         max_length=20, choices=PROGRESSSTATUS, verbose_name="Habit status", default="active"
     )
@@ -198,6 +198,7 @@ class HabitTemplate(models.Model):
     """
     name = models.CharField(max_length=50, verbose_name="Habit name", unique=True)
     description = models.TextField(verbose_name="Description", blank=True, null=True)
+    short_descritpion = models.TextField(verbose_name="Short description", blank=True, null=True)
     habit_group = models.ForeignKey(
         "HabitGroup",
         on_delete=models.PROTECT,
@@ -220,6 +221,12 @@ class HabitTemplate(models.Model):
     habit_type = models.CharField(
         max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
     )
+    routine_tasks = ArrayField(
+        models.CharField(),
+        null=True,
+        blank=True,
+        verbose_name="Routine tasks", 
+    )
     repeat_period = models.CharField(
         max_length=20, choices=REPEATPERIOD, verbose_name="Repeat period", default="always"
     )
@@ -236,7 +243,10 @@ class HabitTemplate(models.Model):
         blank=True,
         verbose_name="Due dates", 
     )
-    
+    paid = models.BooleanField(verbose_name='Paid', default=False)
+    copyDescription = models.BooleanField(verbose_name='CopyDescription', default=False)
+    active = models.BooleanField(verbose_name='Active', default=True)
+
     def __str__(self):
         return self.name
         

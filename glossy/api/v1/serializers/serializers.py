@@ -219,10 +219,10 @@ class HabitTemplateSerializer(serializers.ModelSerializer):
             rep["habit_group"] = instance.habit_group.name
         
         # Отображение задач рутины для привычки типа "routine"
-        if instance.habit_type == "routine":
-            rep["routine_tasks"] = [
-                {task.name: task.is_done} for task in instance.routine_tasks.all()
-            ]
+        # if instance.habit_type == "routine":
+        #     rep["routine_tasks"] = [
+        #         {task: task.is_done} for task in instance.routine_tasks
+        #     ]
         return rep
 
     def to_internal_value(self, data):
