@@ -54,8 +54,9 @@ class HabitTemplateAdmin(admin.ModelAdmin):
 
 @admin.register(LifeSpheres)
 class LifeSpheresAdmin(admin.ModelAdmin):
-    fields = ["name","habit_group"]
-    list_display = ("id", "name", "habit_group")
+    fields = ["name", "habit_groups"]
+    list_display = ("id", "name")
+    filter_horizontal = ("habit_groups",)
 
 @admin.register(TemplateBundles)
 class TemplateBundlesAdmin(admin.ModelAdmin):

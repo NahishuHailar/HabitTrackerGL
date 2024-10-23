@@ -247,13 +247,10 @@ class LifeSpheres(models.Model):
     Spheres of human life balance wheel
     """       
     name = models.CharField(max_length=300, verbose_name="Life_spheres_name")
-    habit_group = models.ForeignKey(
-        "HabitGroup",
-        on_delete=models.PROTECT,
+    habit_groups = models.ManyToManyField(
+        HabitGroup,
         blank=True,
-        null=True,
-        default=None,
-        verbose_name="Habit group",
+        verbose_name="Habit groups"
     )   
     
     def __str__(self):
@@ -331,5 +328,9 @@ class TemplateBundleItem(models.Model):
         return f"Item in {self.template_bundle.name}"
     
 
-
+class HabitTemplateTranslation(models.Model):
+    habit_template = models.ForeignKey(HabitTemplate, on_delete=models.CASCADE, related_name="translations")
+    language_code = models.CharField(max_length=10)
+    name = models.CharField(max_length=50)
+    description = models.TextField()
     
