@@ -49,8 +49,8 @@ class RoutineTaskAdmin(admin.ModelAdmin):
 
 @admin.register(HabitTemplate)
 class HabitTemplateAdmin(admin.ModelAdmin):
-    fields = ["name", "description","short_descritpion","template_bundles", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "textIsAiGenerated", "paid", "active"]
-    list_display = ("id", "name", "description","short_descritpion", "template_bundles", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "textIsAiGenerated", "paid", "active")
+    fields = ["name", "description","short_descritpion", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "textIsAiGenerated", "paid", "active"]
+    list_display = ("id", "name", "description","short_descritpion", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "textIsAiGenerated", "paid", "active")
 
 @admin.register(LifeSpheres)
 class LifeSpheresAdmin(admin.ModelAdmin):

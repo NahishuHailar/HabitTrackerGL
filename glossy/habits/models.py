@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 from users.models import User
 from habits.services.constants import PROGRESSSTATUS, REPEATPERIOD, TRACKTIME, COLOR, HABITTYPE
 from api.v1.services.manager import ActiveHabitManager
-
+from rest_framework.exceptions import ValidationError
 
 class Habit(models.Model):
     """
@@ -209,15 +209,6 @@ class HabitTemplate(models.Model):
     )
     textIsAiGenerated = models.BooleanField(default=False, verbose_name="AI_Generated")
     goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
-    template_bundles = models.ForeignKey(
-        "TemplateBundles",
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        default=None,
-        verbose_name="TemplateBundles",
-    )
-
     habit_type = models.CharField(
         max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
     )
@@ -304,6 +295,23 @@ class TemplateBundles(models.Model):
         
         return templates
     
+    def save(self, *args, **kwargs):
+        if self.parent_bundle and self.parent_bundle == self:
+            raise ValidationError("TemplateBundle не может быть включен в себя.")
+        
+        # Проверка на наличие зацикленных зависимостей
+        def check_recursive_inclusion(bundle, parent):
+            if parent == bundle:
+                raise ValidationError("Нельзя создать циклическую зависимость.")
+            if parent.parent_bundle:
+                check_recursive_inclusion(bundle, parent.parent_bundle)
+
+        if self.parent_bundle:
+            check_recursive_inclusion(self, self.parent_bundle)
+
+        super().save(*args, **kwargs)
+
+
 
 class TemplateBundleItem(models.Model):
     """

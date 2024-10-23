@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.models import User, UserAvatar, AvatarGroup
-from habits.models import Habit, HabitGroup, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres, TemplateBundles
+from habits.models import Habit, HabitGroup, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres, TemplateBundles, TemplateBundleItem
 from habits.services.creating_habit import create_habit_from_template
 
 
@@ -218,11 +218,6 @@ class HabitTemplateSerializer(serializers.ModelSerializer):
         if instance.habit_group:
             rep["habit_group"] = instance.habit_group.name
         
-        # Отображение задач рутины для привычки типа "routine"
-        # if instance.habit_type == "routine":
-        #     rep["routine_tasks"] = [
-        #         {task: task.is_done} for task in instance.routine_tasks
-        #     ]
         return rep
 
     def to_internal_value(self, data):
@@ -299,9 +294,32 @@ class LifeSpheresSerializer(serializers.ModelSerializer):
         return validated_data    
 
 class TemplateBundlesSerializer(serializers.ModelSerializer):
+    
+    habit_templates = serializers.ListField(child=serializers.CharField(), required=False)
+    
     class Meta:
         model = TemplateBundles
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'parent_bundle', 'habit_templates']
+
+    
+    def create(self, validated_data):
+        # Извлекаем список шаблонов
+        habit_templates_data = validated_data.pop('habit_templates', [])
+        template_bundle = TemplateBundles.objects.create(**validated_data)
+
+        # Обрабатываем каждый элемент списка шаблонов
+        for habit_template_data in habit_templates_data:
+            # Проверяем, является ли переданное значение числовым (ID) или строкой (имя)
+            if habit_template_data.isdigit():
+                habit_template = HabitTemplate.objects.get(id=habit_template_data)
+            else:
+                habit_template = HabitTemplate.objects.get(name=habit_template_data)
+
+            # Создаем связь через TemplateBundleItem
+            TemplateBundleItem.objects.create(template_bundle=template_bundle, habit_template=habit_template)
+
+        return template_bundle
+    
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)

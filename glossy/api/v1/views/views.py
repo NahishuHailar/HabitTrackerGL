@@ -36,6 +36,8 @@ from api.v1.services.old_calendars.get_old_calendar import (
 )
 from api.v1.services.update_habit_progress.routine_progress import check_input_progrees
 
+from habits.services.creating_habit import create_habit_from_template
+
 logger = logging.getLogger(__name__)
 
 
@@ -304,3 +306,27 @@ class LifeSpheresViewSet(viewsets.ModelViewSet):
 class TemplateBundlesViewSet(viewsets.ModelViewSet):
     queryset = TemplateBundles.objects.all()
     serializer_class = TemplateBundlesSerializer
+
+    @action(detail=True, methods=['post'], url_path='create-habits-from-bundle')
+    def create_habits_from_bundle(self, request, pk=None):
+        """
+        Создать привычки на основе TemplateBundle и его шаблонов.
+        """
+        template_bundle = self.get_object()  # Получаем TemplateBundle по ID
+        user = request.user
+        
+        # Получаем все шаблоны, связанные с этим TemplateBundle
+        habit_template_ids = template_bundle.get_all_templates()
+
+        created_habits = []
+        for template_id in habit_template_ids:
+            new_habit = create_habit_from_template(user.id, template_id)
+            created_habits.append({
+                'habit_id': new_habit.id,
+                'habit_name': new_habit.name,
+                'habit_type': new_habit.habit_type,
+            })
+
+        return Response({'created_habits': created_habits}, status=status.HTTP_201_CREATED)
+
+    
