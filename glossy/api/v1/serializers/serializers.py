@@ -214,7 +214,16 @@ class HabitTemplateListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HabitTemplate
-        fields = ['id', 'name', 'short_description', 'text_is_ai_generated', 'paid']
+        fields = ['id', 'name', 'short_description', 'icon', 'habit_group', 'text_is_ai_generated', 'paid']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        
+        # Отображение группы привычек по имени
+        if instance.habit_group:
+            rep["habit_group"] = instance.habit_group.name
+        
+        return rep
 
     def get_name(self, obj):
         user_locale = self.context.get('user_locale', 'en')
