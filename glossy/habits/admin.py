@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 
-from .models import HabitGroup, Habit, HabitHistory, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres, TemplateBundles, TemplateBundleItem
+from .models import HabitGroup, Habit, HabitHistory, HabitProgress, Icon, RoutineTask, HabitTemplate, LifeSpheres, TemplateBundles, TemplateBundleItem, HabitTemplateTranslation
 
 
 @admin.register(Habit)
@@ -49,8 +49,8 @@ class RoutineTaskAdmin(admin.ModelAdmin):
 
 @admin.register(HabitTemplate)
 class HabitTemplateAdmin(admin.ModelAdmin):
-    fields = ["name", "description","short_descritpion", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "textIsAiGenerated", "paid", "active"]
-    list_display = ("id", "name", "description","short_descritpion", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "textIsAiGenerated", "paid", "active")
+    fields = ["name", "description","short_description", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "text_is_ai_generated", "paid", "active"]
+    list_display = ("id", "name", "description","short_description", "routine_tasks", "goal", "habit_group", "habit_type", "repeat_period", "icon", "track_time", "due_dates", "text_is_ai_generated", "paid", "active")
 
 @admin.register(LifeSpheres)
 class LifeSpheresAdmin(admin.ModelAdmin):
@@ -92,3 +92,11 @@ class HabitHistoryAdmin(admin.ModelAdmin):
 class IconAdmin(admin.ModelAdmin):
     fields = ["name", "emoji_name", "habit_group", "paid"]
     list_display = ("id", "name", "emoji_name", "habit_group", "paid")
+
+
+
+@admin.register(HabitTemplateTranslation)
+class HabitTemplateTranslationAdmin(admin.ModelAdmin):
+    list_display = ("habit_template", "language_code", "name")
+    list_filter = ("language_code",)
+    search_fields = ("habit_template__name", "name")

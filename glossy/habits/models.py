@@ -198,7 +198,7 @@ class HabitTemplate(models.Model):
     """
     name = models.CharField(max_length=50, verbose_name="Habit name", unique=True)
     description = models.TextField(verbose_name="Description", blank=True, null=True)
-    short_descritpion = models.TextField(verbose_name="Short description", blank=True, null=True)
+    short_description = models.TextField(verbose_name="Short description", blank=True, null=True)
     habit_group = models.ForeignKey(
         "HabitGroup",
         on_delete=models.PROTECT,
@@ -207,7 +207,7 @@ class HabitTemplate(models.Model):
         default=None,
         verbose_name="Habit group",
     )
-    textIsAiGenerated = models.BooleanField(default=False, verbose_name="AI_Generated")
+    text_is_ai_generated = models.BooleanField(default=False, verbose_name="AI_Generated")
     goal = models.SmallIntegerField(verbose_name="Goal", blank=True, null=True)
     habit_type = models.CharField(
         max_length=20, choices=HABITTYPE, verbose_name="Habit type", default="regular"
@@ -328,9 +328,21 @@ class TemplateBundleItem(models.Model):
         return f"Item in {self.template_bundle.name}"
     
 
+
 class HabitTemplateTranslation(models.Model):
-    habit_template = models.ForeignKey(HabitTemplate, on_delete=models.CASCADE, related_name="translations")
-    language_code = models.CharField(max_length=10)
-    name = models.CharField(max_length=50)
-    description = models.TextField()
-    
+    """
+    Translation for HabitTemplate.
+    """
+    habit_template = models.ForeignKey(
+        "HabitTemplate", on_delete=models.CASCADE, related_name="translations", verbose_name="Habit template"
+    )
+    language_code = models.CharField(max_length=10, verbose_name="Language code")
+    name = models.CharField(max_length=50, verbose_name="Habit name")
+    description = models.TextField(verbose_name="Description", blank=True, null=True)
+
+    class Meta:
+        unique_together = ('habit_template', 'language_code')
+
+    def __str__(self):
+        return f"{self.habit_template.name} ({self.language_code})"
+

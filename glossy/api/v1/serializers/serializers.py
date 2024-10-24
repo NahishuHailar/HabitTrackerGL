@@ -196,12 +196,14 @@ class IconSerializer(serializers.ModelSerializer):
 class CreateHabitFromTemplateSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
     template_id = serializers.IntegerField()
+    user_locale = serializers.CharField(required=False, allow_blank=True, default='en')
 
     def create(self, validated_data):
         # Вызываем сервис для создания привычки
         new_habit = create_habit_from_template(
             user_id=validated_data['user_id'], 
-            template_id=validated_data['template_id']
+            template_id=validated_data['template_id'],
+            user_locale=validated_data.get('user_locale', 'en')
         )
         return new_habit
     
