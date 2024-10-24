@@ -339,7 +339,8 @@ class HabitTemplateTranslation(models.Model):
     language_code = models.CharField(max_length=10, verbose_name="Language code")
     name = models.CharField(max_length=50, verbose_name="Habit name")
     description = models.TextField(verbose_name="Description", blank=True, null=True)
-
+    short_description = models.TextField(verbose_name="Short description", blank=True, null=True)
+    
     class Meta:
         unique_together = ('habit_template', 'language_code')
 

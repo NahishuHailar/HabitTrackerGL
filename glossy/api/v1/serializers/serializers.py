@@ -206,12 +206,51 @@ class CreateHabitFromTemplateSerializer(serializers.Serializer):
             user_locale=validated_data.get('user_locale', 'en')
         )
         return new_habit
-    
 
-class HabitTemplateSerializer(serializers.ModelSerializer):
+
+class HabitTemplateListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    short_description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HabitTemplate
+        fields = ['id', 'name', 'short_description', 'text_is_ai_generated', 'paid']
+
+    def get_name(self, obj):
+        user_locale = self.context.get('user_locale', 'en')
+        translation = obj.translations.filter(language_code=user_locale).first()
+        return translation.name if translation else obj.name
+
+    def get_short_description(self, obj):
+        user_locale = self.context.get('user_locale', 'en')
+        translation = obj.translations.filter(language_code=user_locale).first()
+        return translation.description if translation else obj.short_description
+
+
+class HabitTemplateDetailSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    short_description = serializers.SerializerMethodField()
+    
     class Meta:
         model = HabitTemplate
         fields = '__all__'    
+    
+    def get_name(self, obj):
+        user_locale = self.context.get('user_locale', 'en')
+        translation = obj.translations.filter(language_code=user_locale).first()
+        return translation.name if translation else obj.name
+
+    def get_description(self, obj):
+        user_locale = self.context.get('user_locale', 'en')
+        translation = obj.translations.filter(language_code=user_locale).first()
+        return translation.description if translation else obj.description
+
+    def get_short_description(self, obj):
+        user_locale = self.context.get('user_locale', 'en')
+        translation = obj.translations.filter(language_code=user_locale).first()
+        return translation.short_description if translation else obj.short_description
+    
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)

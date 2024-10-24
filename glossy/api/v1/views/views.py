@@ -20,7 +20,8 @@ from api.v1.serializers.serializers import (
     IconSerializer,
     AvatarGroupSerializer,
     CreateHabitFromTemplateSerializer,
-    HabitTemplateSerializer,
+    HabitTemplateListSerializer,
+    HabitTemplateDetailSerializer,
     LifeSpheresSerializer,
     TemplateBundlesSerializer 
 )
@@ -278,7 +279,20 @@ class HabitTemplateViewSet(viewsets.ModelViewSet):
     ViewSet для CRUD операций с шаблонами привычек и создания привычек на основе шаблонов.
     """    
     queryset = HabitTemplate.objects.all()
-    serializer_class = HabitTemplateSerializer
+    
+    # Выбор сериализаторов в зависимости от типа запроса (список или детально)
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return HabitTemplateListSerializer
+        return HabitTemplateDetailSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # Получаем user_locale из параметров запроса или используем 'en' по умолчанию
+        user_locale = self.request.query_params.get('user_locale', 'en')
+        context['user_locale'] = user_locale
+        return context
+
     
     @action(detail=False, methods=['post'], url_path='create-habit-from-template')
     def create_habit_from_template(self, request):
