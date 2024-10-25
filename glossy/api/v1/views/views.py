@@ -33,7 +33,9 @@ from api.v1.serializers.serializers import (
     HabitTemplateDetailSerializer,
     LifeSpheresSerializer,
     TemplateBundlesSerializer,
+    TemplateBundlesListSerializer,
     UserTrialSerializer,
+
 )
 from users.auth.user_cred import get_user_cred
 from api.v1.services.habit_counters import reset_habits_counters
@@ -330,7 +332,24 @@ class LifeSpheresViewSet(viewsets.ModelViewSet):
 
 class TemplateBundlesViewSet(viewsets.ModelViewSet):
     queryset = TemplateBundles.objects.all()
-    serializer_class = TemplateBundlesSerializer
+    
+    def get_serializer_class(self):
+        """
+        Выбор сериализатора в зависимости от типа действия.
+        """
+        if self.action in ["list", "retrieve"]:
+            return TemplateBundlesListSerializer
+        return TemplateBundlesSerializer
+
+    def get_serializer_context(self):
+        """
+        Передаем в контекст параметр `user_locale` для использования в сериализаторе.
+        """
+        context = super().get_serializer_context()
+        user_locale = self.request.query_params.get('user_locale', 'en')
+        context['user_locale'] = user_locale
+        return context
+
 
     @action(detail=True, methods=["post"], url_path="create-habits")
     def create_habits(self, request, pk=None):

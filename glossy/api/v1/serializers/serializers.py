@@ -424,25 +424,57 @@ class TemplateBundlesSerializer(serializers.ModelSerializer):
         translation = obj.translations.filter(language_code=user_locale).first()
         return translation.description if translation else obj.description
 
-    # def create(self, validated_data):
-    #     translations_data = validated_data.pop('translations', [])
-    #     template_bundle = TemplateBundles.objects.create(**validated_data)
-    #     for translation_data in translations_data:
-    #         TemplateBundlesTranslation.objects.create(template_bundle=template_bundle, **translation_data)
-    #     return template_bundle
 
-    # def update(self, instance, validated_data):
-    #     translations_data = validated_data.pop('translations', [])
-    #     instance = super().update(instance, validated_data)
+class TemplateBundlesListSerializer(serializers.ModelSerializer):
+    templates = serializers.SerializerMethodField()
+    sub_bundles = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
 
-    #     # Update translations
-    #     for translation_data in translations_data:
-    #         TemplateBundlesTranslation.objects.update_or_create(
-    #             template_bundle=instance,
-    #             language_code=translation_data['language_code'],
-    #             defaults={'name': translation_data['name'], 'description': translation_data['description']}
-    #         )
-    #     return instance
+    class Meta:
+        model = TemplateBundles
+        fields = ['id', 'name', 'description', 'templates', 'sub_bundles']
+
+    def get_templates(self, obj):
+        """
+        Возвращает список имен шаблонов с учётом локализации.
+        """
+        user_locale = self.context.get('user_locale', 'en')
+        return [
+            template.translations.filter(language_code=user_locale).first().name 
+            if template.translations.filter(language_code=user_locale).exists() 
+            else template.name
+            for template in obj.templates.all()
+        ]
+
+    def get_sub_bundles(self, obj):
+        """
+        Возвращает список имен поднаборов с учётом локализации.
+        """
+        user_locale = self.context.get('user_locale', 'en')
+        return [
+            sub_bundle.translations.filter(language_code=user_locale).first().name 
+            if sub_bundle.translations.filter(language_code=user_locale).exists() 
+            else sub_bundle.name
+            for sub_bundle in obj.sub_bundles.all()
+        ]
+
+    def get_name(self, obj):
+        """
+        Возвращает локализованное имя или стандартное имя, если перевода нет.
+        """
+        user_locale = self.context.get('user_locale', 'en')
+        translation = obj.translations.filter(language_code=user_locale).first()
+        return translation.name if translation else obj.name
+
+    def get_description(self, obj):
+        """
+        Возвращает локализованное описание или стандартное описание, если перевода нет.
+        """
+        user_locale = self.context.get('user_locale', 'en')
+        translation = obj.translations.filter(language_code=user_locale).first()
+        return translation.description if translation else obj.description
+   
 
 
 class UserTrialSerializer(serializers.ModelSerializer):
