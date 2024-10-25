@@ -10,7 +10,15 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
 from users.models import User, UserAvatar, AvatarGroup
-from habits.models import Habit, HabitProgress, HabitGroup, Icon, HabitTemplate, LifeSpheres, TemplateBundles
+from habits.models import (
+    Habit,
+    HabitProgress,
+    HabitGroup,
+    Icon,
+    HabitTemplate,
+    LifeSpheres,
+    TemplateBundles,
+)
 from api.v1.serializers.serializers import (
     HabitGroupSerializer,
     UserSerializer,
@@ -23,7 +31,7 @@ from api.v1.serializers.serializers import (
     HabitTemplateListSerializer,
     HabitTemplateDetailSerializer,
     LifeSpheresSerializer,
-    TemplateBundlesSerializer 
+    TemplateBundlesSerializer,
 )
 from users.auth.user_cred import get_user_cred
 from api.v1.services.habit_counters import reset_habits_counters
@@ -117,7 +125,7 @@ class HabitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
         # Checking if the current_value has changed for regular habit
         new_current_value = request.data.get("current_value")
         if new_current_value and habit.current_value != int(new_current_value):
-        # Creating a new progress record for regular habit
+            # Creating a new progress record for regular habit
             HabitProgress.objects.create(
                 habit=habit,
                 user_id=self.kwargs["user_id"],
@@ -221,10 +229,9 @@ class HabitProgressPagAPIView(APIView):
             user_id=user_id, habit_id=habit_id, pagination=pagination
         )
         result = {}
-        result['pagination'] = {'last_page': last_page, 'out_of_range': out_of_range}
-        result['data'] = progress_calendar
+        result["pagination"] = {"last_page": last_page, "out_of_range": out_of_range}
+        result["data"] = progress_calendar
         return Response(result)
-
 
 
 class CommonHabitProgressPagAPIView(APIView):
@@ -239,10 +246,10 @@ class CommonHabitProgressPagAPIView(APIView):
         common_progress_calendar, last_page, out_of_range = (
             get_common_progress_calendar(user_id=user_id, pagination=pagination)
         )
-       
+
         result = {}
-        result['pagination'] = {'last_page': last_page, 'out_of_range': out_of_range}
-        result['data'] = common_progress_calendar
+        result["pagination"] = {"last_page": last_page, "out_of_range": out_of_range}
+        result["data"] = common_progress_calendar
         return Response(result)
 
 
@@ -273,28 +280,27 @@ class CommonHabitProgressAPIView(APIView):
         return Response(common_progress_calendar)
 
 
-
 class HabitTemplateViewSet(viewsets.ModelViewSet):
     """
     ViewSet для CRUD операций с шаблонами привычек и создания привычек на основе шаблонов.
-    """    
+    """
+
     queryset = HabitTemplate.objects.all()
-    
+
     # Выбор сериализаторов в зависимости от типа запроса (список или детально)
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return HabitTemplateListSerializer
         return HabitTemplateDetailSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         # Получаем user_locale из параметров запроса или используем 'en' по умолчанию
-        user_locale = self.request.query_params.get('user_locale', 'en')
-        context['user_locale'] = user_locale
+        user_locale = self.request.query_params.get("user_locale", "en")
+        context["user_locale"] = user_locale
         return context
 
-    
-    @action(detail=False, methods=['post'], url_path='create-habit-from-template')
+    @action(detail=False, methods=["post"], url_path="create-habit-from-template")
     def create_habit_from_template(self, request):
         """
         Создать привычку на основе шаблона.
@@ -302,45 +308,56 @@ class HabitTemplateViewSet(viewsets.ModelViewSet):
         serializer = CreateHabitFromTemplateSerializer(data=request.data)
         if serializer.is_valid():
             new_habit = serializer.save()
-            return Response({
-                'habit_id': new_habit.id,
-                'habit_name': new_habit.name,
-                'habit_group': new_habit.habit_group.name,
-                'description': new_habit.description,
-                'goal': new_habit.goal,
-            }, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "habit_id": new_habit.id,
+                    "habit_name": new_habit.name,
+                    "habit_group": new_habit.habit_group.name,
+                    "description": new_habit.description,
+                    "goal": new_habit.goal,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class LifeSpheresViewSet(viewsets.ModelViewSet):
     queryset = LifeSpheres.objects.all()
-    serializer_class = LifeSpheresSerializer   
-    
+    serializer_class = LifeSpheresSerializer
+
 
 class TemplateBundlesViewSet(viewsets.ModelViewSet):
     queryset = TemplateBundles.objects.all()
     serializer_class = TemplateBundlesSerializer
 
-    @action(detail=True, methods=['post'], url_path='create-habits-from-bundle')
-    def create_habits_from_bundle(self, request, pk=None):
+    @action(detail=True, methods=["post"], url_path="create-habits")
+    def create_habits(self, request, pk=None):
         """
-        Создать привычки на основе TemplateBundle и его шаблонов.
+        Рекурсивно создаёт привычки из набора шаблонов и его поднаборов.
         """
-        template_bundle = self.get_object()  # Получаем TemplateBundle по ID
-        user = request.user
-        
-        # Получаем все шаблоны, связанные с этим TemplateBundle
-        habit_template_ids = template_bundle.get_all_templates()
+        bundle = self.get_object()
+        user_id = request.data.get("user_id")
+        user_locale = request.data.get("user_locale", "en")
 
+        if not user_id:
+            return Response(
+                {"error": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        created_habits = self._create_habits_from_bundle(bundle, user_id, user_locale)
+        return Response(created_habits, status=status.HTTP_201_CREATED)
+
+    def _create_habits_from_bundle(self, bundle, user_id, user_locale):
         created_habits = []
-        for template_id in habit_template_ids:
-            new_habit = create_habit_from_template(user.id, template_id)
-            created_habits.append({
-                'habit_id': new_habit.id,
-                'habit_name': new_habit.name,
-                'habit_type': new_habit.habit_type,
-            })
+        for template in bundle.templates.all():
+            habit = create_habit_from_template(
+                user_id=user_id, template_id=template.id, user_locale=user_locale
+            )
+            created_habits.append({"habit_id": habit.id, "name": habit.name})
 
-        return Response({'created_habits': created_habits}, status=status.HTTP_201_CREATED)
-
-    
+        # Рекурсивно создаём привычки из поднаборов
+        for sub_bundle in bundle.sub_bundles.all():
+            created_habits.extend(
+                self._create_habits_from_bundle(sub_bundle, user_id, user_locale)
+            )
+        return created_habits
