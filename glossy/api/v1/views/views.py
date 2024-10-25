@@ -7,9 +7,10 @@ from rest_framework.views import APIView
 
 from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import cache_page
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 
-from users.models import User, UserAvatar, AvatarGroup
+from users.models import User, UserAvatar, AvatarGroup, UserTrial
 from habits.models import (
     Habit,
     HabitProgress,
@@ -32,6 +33,7 @@ from api.v1.serializers.serializers import (
     HabitTemplateDetailSerializer,
     LifeSpheresSerializer,
     TemplateBundlesSerializer,
+    UserTrialSerializer,
 )
 from users.auth.user_cred import get_user_cred
 from api.v1.services.habit_counters import reset_habits_counters
@@ -361,3 +363,31 @@ class TemplateBundlesViewSet(viewsets.ModelViewSet):
                 self._create_habits_from_bundle(sub_bundle, user_id, user_locale)
             )
         return created_habits
+
+
+class UserTrialViewSet(viewsets.ViewSet):
+    def list(self, request):
+        # Получаем или создаем запись пробного периода для пользователя
+        trial, created = UserTrial.objects.get_or_create(user=request.user)
+        serializer = UserTrialSerializer(trial)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], url_path="new")
+    def new_trial(self, request):
+        # Получаем или создаем запись пробного периода для пользователя
+        trial, created = UserTrial.objects.get_or_create(user=request.user)
+
+        # Логика для выдачи триалов
+        if not trial.first_trial_date:
+            # Если первый триал еще не был выдан
+            trial.first_trial_date = timezone.now()
+            trial.save()
+            return Response({"trial_granted": True}, status=status.HTTP_200_OK)
+        elif not trial.second_trial_date:
+            # Если первый триал уже выдан, но второй еще нет
+            trial.second_trial_date = timezone.now()
+            trial.save()
+            return Response({"trial_granted": True}, status=status.HTTP_200_OK)
+        else:
+            # Оба триала уже были выданы
+            return Response({"trial_granted": False}, status=status.HTTP_200_OK)

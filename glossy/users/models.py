@@ -93,3 +93,12 @@ class AvatarGroup(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserTrial(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="trial_info")
+    first_trial_date = models.DateTimeField(null=True, blank=True)
+    second_trial_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Trial info for user {self.user.email}"

@@ -21,6 +21,7 @@ from api.v1.views.views import (
     CommonHabitProgressAPIView,
     HabitTemplateViewSet,
     TemplateBundlesViewSet,
+    UserTrialViewSet,
 )
 
 urlpatterns = [
@@ -87,5 +88,6 @@ router.register(r"api/v1/life-spheres", LifeSpheresViewSet, basename="life-spher
 router.register(
     r"api/v1/template-bundles", TemplateBundlesViewSet, basename="template-bundles"
 )
+router.register(r"api/v1/user-trial", UserTrialViewSet, basename="user-trial")
 
 urlpatterns += router.urls

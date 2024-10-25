@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User as CustomUser
-from .models import UserAvatar, AvatarGroup
+from .models import UserAvatar, AvatarGroup, UserTrial
 
 
 @admin.register(CustomUser)
@@ -55,3 +55,11 @@ class UserAvatarAdmin(admin.ModelAdmin):
 class AvatarGroupAdmin(admin.ModelAdmin):
     fields = ["name", "product_id"]
     list_display = ("id", "name", "product_id")
+
+
+
+@admin.register(UserTrial)
+class UserTrialAdmin(admin.ModelAdmin):
+    list_display = ('user', 'first_trial_date', 'second_trial_date')
+    search_fields = ('user__email',)
+    list_filter = ('first_trial_date', 'second_trial_date')

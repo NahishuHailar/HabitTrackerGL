@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import User, UserAvatar, AvatarGroup
+from users.models import User, UserAvatar, AvatarGroup, UserTrial
 from habits.models import (
     Habit,
     HabitGroup,
@@ -443,3 +443,9 @@ class TemplateBundlesSerializer(serializers.ModelSerializer):
     #             defaults={'name': translation_data['name'], 'description': translation_data['description']}
     #         )
     #     return instance
+
+
+class UserTrialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserTrial
+        fields = ['first_trial_date', 'second_trial_date']
